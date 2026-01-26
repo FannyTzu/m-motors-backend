@@ -8,6 +8,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "dependencies": {
+    "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
     "aws-ssl-profiles": "^1.1.2",
     "c12": "^3.1.0",
@@ -53,6 +54,7 @@
     "path-key": "^3.1.1",
     "pathe": "^2.0.3",
     "perfect-debounce": "^1.0.0",
+    "pg": "^8.17.2",
     "pkg-types": "^2.3.0",
     "postgres": "^3.4.7",
     "proper-lockfile": "^4.1.2",
@@ -80,7 +82,9 @@
     "zod": "^4.3.6"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js"
   },
   "keywords": [],
   "author": "",
