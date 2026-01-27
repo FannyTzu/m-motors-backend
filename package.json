@@ -41,6 +41,7 @@
     "iconv-lite": "^0.7.2",
     "is-property": "^1.0.2",
     "isexe": "^2.0.0",
+    "jest": "^30.2.0",
     "jiti": "^2.6.1",
     "lilconfig": "^2.1.0",
     "lodash": "^4.17.21",
@@ -82,7 +83,9 @@
     "zod": "^4.3.6"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "dev": "nodemon src/index.js",
     "start": "node src/index.js"
   },
