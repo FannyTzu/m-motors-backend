@@ -141,4 +141,8 @@ vite.config.ts.timestamp-*
 # .env.local files
 .env.*
 
+# Prisma Client
 /generated/prisma
+
+# settings IDE
+settings.json
