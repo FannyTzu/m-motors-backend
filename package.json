@@ -1,8 +1,14 @@
 {
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.0.10",
+    "@types/pg": "^8.16.0",
     "nodemon": "^3.1.11",
-    "prisma": "^7.3.0"
+    "prisma": "^7.3.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0"
   },
   "name": "m-motors-backend",
   "version": "1.0.0",
@@ -11,6 +17,7 @@
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
     "aws-ssl-profiles": "^1.1.2",
+    "bcrypt": "^6.0.0",
     "c12": "^3.1.0",
     "chevrotain": "^10.5.0",
     "chokidar": "^4.0.3",
@@ -43,6 +50,7 @@
     "isexe": "^2.0.0",
     "jest": "^30.2.0",
     "jiti": "^2.6.1",
+    "jsonwebtoken": "^9.0.3",
     "lilconfig": "^2.1.0",
     "lodash": "^4.17.21",
     "long": "^5.3.2",
@@ -86,8 +94,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "dev": "nodemon src/index.js",
-    "start": "node src/index.js",
+    "dev": "nodemon --exec tsx src/index.ts",
+    "start": "tsx src/index.ts",
     "build": "echo 'No build step for backend'"
   },
   "keywords": [],
