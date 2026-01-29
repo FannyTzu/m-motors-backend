@@ -4,6 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 import { createAuthRoutes } from "./routes/auth.routes.js";
+import cookieParser from "cookie-parser";
 import "dotenv/config";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -22,6 +23,8 @@ app.use(
   }),
 );
 app.use(express.json());
+
+app.use(cookieParser());
 
 app.get("/", (req, res) => {
   res.json({ message: "M-Motors API is running" });
