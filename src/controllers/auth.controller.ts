@@ -43,5 +43,28 @@ export const authController = (prisma: PrismaClient) => {
         res.status(400).json({ error: (error as Error).message });
       }
     },
+    me: async (req: Request, res: Response) => {
+      if (!req.user) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      const userId = req.user.userId;
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          mail: true,
+          role: true,
+        },
+      });
+      res.status(200).json({ user });
+    },
+    logout: (req: Request, res: Response) => {
+      res.clearCookie("access_token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+      });
+      res.status(200).json({ message: "Logged out successfully" });
+    },
   };
 };
