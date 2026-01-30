@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
-import { registerUser, loginUser } from "../services/auth.service.js";
+import { registerUser, loginUser } from "../services/auth.service";
 import jwt from "jsonwebtoken";
 
 export const authController = (prisma: PrismaClient) => {
