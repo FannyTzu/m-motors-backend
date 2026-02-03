@@ -76,7 +76,7 @@ export const loginUser = async (
     data: {
       token_hash: refreshTokenHash,
       user_id: user.id,
-      expires_at: new Date(Date.now() + 5000),
+      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     },
   });
 
