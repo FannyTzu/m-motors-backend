@@ -14,7 +14,7 @@ export const registerUser = async (
 ) => {
   const { mail, password } = userData;
 
-  const existingUser = await prisma.user.findUnique({ where: { mail } });
+  const existingUser = await prisma.user.findUnique({ where: { mail: mail } });
   if (existingUser) {
     //in french but it s use in frontend (for user)
     throw new Error("Cet email est déjà utilisé.");
@@ -76,7 +76,7 @@ export const loginUser = async (
     data: {
       token_hash: refreshTokenHash,
       user_id: user.id,
-      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      expires_at: new Date(Date.now() + 5000),
     },
   });
 

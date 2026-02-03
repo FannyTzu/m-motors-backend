@@ -24,7 +24,11 @@ export const authController = (prisma: PrismaClient) => {
         });
 
         res.status(201).json({
-          user: result.newUser,
+          user: {
+            id: result.newUser.id,
+            mail: result.newUser.mail,
+            role: result.newUser.role,
+          },
           accessToken: result.accessToken,
         });
       } catch (error) {
@@ -56,7 +60,7 @@ export const authController = (prisma: PrismaClient) => {
         return res.status(401).json({ error: "Unauthorized" });
       }
 
-      const userId = req.user.userId;
+      const userId = req.user.sub;
       const user = await prisma.user.findUnique({
         where: { id: userId },
         select: {
