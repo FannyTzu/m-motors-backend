@@ -1,7 +1,10 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
-import { registerUser, loginUser } from "../services/auth.service";
-import jwt from "jsonwebtoken";
+import {
+  registerUser,
+  loginUser,
+  refreshAccessToken,
+} from "../services/auth.service";
 
 export const authController = (prisma: PrismaClient) => {
   return {
@@ -12,7 +15,18 @@ export const authController = (prisma: PrismaClient) => {
           mail: email,
           password,
         });
-        res.status(201).json(result);
+
+        res.cookie("refresh_token", result.refreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
+        res.status(201).json({
+          user: result.newUser,
+          accessToken: result.accessToken,
+        });
       } catch (error) {
         res.status(400).json({ error: (error as Error).message });
       }
@@ -20,25 +34,19 @@ export const authController = (prisma: PrismaClient) => {
     login: async (req: Request, res: Response) => {
       try {
         const { email, password } = req.body;
-        const user = await loginUser(prisma, email, password);
+        const result = await loginUser(prisma, email, password);
 
-        const secret = process.env.JWT_ACCESS_SECRET;
-        if (!secret) {
-          throw new Error("JWT_ACCESS_SECRET is not defined");
-        }
-
-        const token = jwt.sign({ userId: user.id }, secret, {
-          expiresIn: "1h",
-        });
-
-        res.cookie("access_token", token, {
+        res.cookie("refresh_token", result.refreshToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
-          maxAge: 3600000,
+          maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
-        res.status(200).json({ user });
+        res.status(200).json({
+          user: { id: result.id, email: result.email },
+          accessToken: result.accessToken,
+        });
       } catch (error) {
         res.status(400).json({ error: (error as Error).message });
       }
@@ -60,11 +68,24 @@ export const authController = (prisma: PrismaClient) => {
       res.status(200).json({ user });
     },
     logout: (req: Request, res: Response) => {
-      res.clearCookie("access_token", {
+      res.clearCookie("refresh_token", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
       });
       res.status(200).json({ message: "Logged out successfully" });
+    },
+    refreshToken: async (req: Request, res: Response) => {
+      try {
+        const refreshToken = req.cookies.refresh_token;
+        if (!refreshToken) {
+          return res.status(401).json({ error: "Refresh token not found" });
+        }
+
+        const result = await refreshAccessToken(prisma, refreshToken);
+        res.status(200).json({ accessToken: result.accessToken });
+      } catch (error) {
+        res.status(401).json({ error: (error as Error).message });
+      }
     },
   };
 };
