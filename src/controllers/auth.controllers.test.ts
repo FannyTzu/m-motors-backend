@@ -84,3 +84,22 @@ it("retourne 401 si req.user est absent", async () => {
   const res = await request(app).get("/auth/me");
   expect(res.status).toBe(401);
 });
+
+it("retourne 401 si refresh_token est absent", async () => {
+  const res = await request(app).post("/auth/refresh-token");
+  expect(res.status).toBe(401);
+  expect(res.body.error).toBe("Refresh token not found");
+});
+
+it("retourne 200 et un accessToken si refresh_token est valide", async () => {
+  (authService.refreshAccessToken as jest.Mock).mockResolvedValue({
+    accessToken: "newAccessToken",
+  });
+
+  const res = await request(app)
+    .post("/auth/refresh-token")
+    .set("Cookie", ["refresh_token=valid-refresh-token"]);
+
+  expect(res.status).toBe(200);
+  expect(res.body.accessToken).toBe("newAccessToken");
+});

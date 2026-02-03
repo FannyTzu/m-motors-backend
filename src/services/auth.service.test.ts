@@ -1,4 +1,4 @@
-import { registerUser, loginUser } from "./auth.service";
+import { registerUser, loginUser, refreshAccessToken } from "./auth.service";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -64,7 +64,6 @@ describe("registerUser", () => {
     });
     expect(result.accessToken).toBe("accessToken");
   });
-  it;
 });
 
 describe("loginUser", () => {
@@ -110,5 +109,49 @@ describe("loginUser", () => {
     expect(result.id).toBe(1);
     expect(result.email).toBe("test@example.com");
     expect(result.accessToken).toBe("accessToken");
+  });
+});
+
+describe("refreshAccessToken", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("throw une erreur si le refresh token est absent", async () => {
+    await expect(refreshAccessToken(prismaMock, "")).rejects.toThrow(
+      "Refresh token is required",
+    );
+  });
+
+  it("throw une erreur si le refresh token est invalide", async () => {
+    prismaMock.refreshToken.findMany.mockResolvedValue([
+      {
+        token_hash: "hashedToken",
+        expires_at: new Date(Date.now() + 60_000),
+        user: { id: 1, role: "client" },
+      },
+    ]);
+    (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+
+    await expect(
+      refreshAccessToken(prismaMock, "invalid-refresh"),
+    ).rejects.toThrow("Invalid or expired refresh token");
+  });
+
+  it("retourne un access token si le refresh token est valide", async () => {
+    prismaMock.refreshToken.findMany.mockResolvedValue([
+      {
+        token_hash: "hashedToken",
+        expires_at: new Date(Date.now() + 60_000),
+        user: { id: 1, role: "client" },
+      },
+    ]);
+    (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+    (jwt.sign as jest.Mock).mockReturnValue("newAccessToken");
+
+    const result = await refreshAccessToken(prismaMock, "valid-refresh");
+
+    expect(result.accessToken).toBe("newAccessToken");
+    expect(jwt.sign).toHaveBeenCalled();
   });
 });
