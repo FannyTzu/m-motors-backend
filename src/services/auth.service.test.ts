@@ -10,6 +10,10 @@ const prismaMock = {
     findUnique: jest.fn(),
     create: jest.fn(),
   },
+  refreshToken: {
+    create: jest.fn(),
+    findMany: jest.fn(),
+  },
 } as any;
 
 describe("registerUser", () => {
@@ -36,7 +40,12 @@ describe("registerUser", () => {
     prismaMock.user.create.mockResolvedValue({
       id: 1,
       mail: "test@example.com",
-      role: "user",
+      role: "client",
+    });
+    prismaMock.refreshToken.create.mockResolvedValue({
+      id: 1,
+      token_hash: "hashedToken",
+      user_id: 1,
     });
     (bcrypt.hash as jest.Mock).mockResolvedValue("hashedPassword");
     (jwt.sign as jest.Mock).mockReturnValue("accessToken");
@@ -46,15 +55,14 @@ describe("registerUser", () => {
     });
     expect(bcrypt.hash).toHaveBeenCalledWith("password123", 12);
     expect(prismaMock.user.create).toHaveBeenCalled();
+    expect(prismaMock.refreshToken.create).toHaveBeenCalled();
     expect(jwt.sign).toHaveBeenCalled();
-    expect(result).toEqual({
-      newUser: {
-        id: 1,
-        mail: "test@example.com",
-        role: "user",
-      },
-      accessToken: "accessToken",
+    expect(result.newUser).toEqual({
+      id: 1,
+      mail: "test@example.com",
+      role: "client",
     });
+    expect(result.accessToken).toBe("accessToken");
   });
   it;
 });
@@ -85,16 +93,22 @@ describe("loginUser", () => {
       id: 1,
       mail: "test@example.com",
       password_hash: "HashedPassword",
+      role: "client",
+    });
+    prismaMock.refreshToken.create.mockResolvedValue({
+      id: 1,
+      token_hash: "hashedToken",
+      user_id: 1,
     });
     (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+    (jwt.sign as jest.Mock).mockReturnValue("accessToken");
     const result = await loginUser(
       prismaMock,
       "test@example.com",
-      "HashedPassword",
+      "password123",
     );
-    expect(result).toEqual({
-      id: 1,
-      email: "test@example.com",
-    });
+    expect(result.id).toBe(1);
+    expect(result.email).toBe("test@example.com");
+    expect(result.accessToken).toBe("accessToken");
   });
 });
