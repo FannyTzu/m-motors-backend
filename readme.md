@@ -60,6 +60,8 @@ src/
 
 .env
 
+Choix de cette structure :
+séparation des responsabilités
 
 ⚙️ Variables d’environnement
 

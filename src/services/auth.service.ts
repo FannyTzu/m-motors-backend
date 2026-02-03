@@ -15,6 +15,7 @@ export const registerUser = async (
 
   const existingUser = await prisma.user.findUnique({ where: { mail } });
   if (existingUser) {
+    //in french but it s use in frontend (for user)
     throw new Error("Cet email est déjà utilisé.");
   }
 
