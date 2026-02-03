@@ -57,8 +57,20 @@ model User {
   zip_code      String?  @db.VarChar(5)
   country       String?  @default("France")
   role          Role     @default(client)
+  is_active     Boolean  @default(true)
   created_at    DateTime @default(now())
-  folders       Folder[]
+
+  folders        Folder[]
+  refresh_tokens RefreshToken[]
+}
+
+model RefreshToken {
+  id          Int      @id @default(autoincrement())
+  token_hash  String
+  user_id     Int
+  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  expires_at  DateTime
+  created_at  DateTime @default(now())
 }
 
 model Folder {
