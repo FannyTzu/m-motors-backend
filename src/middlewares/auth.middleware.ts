@@ -1,7 +1,10 @@
 import jwt from "jsonwebtoken";
+import { Role } from "@prisma/client";
 
 export const authMiddleware = (req: any, res: any, next: any) => {
-  const token = req.cookies.access_token;
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.split(" ")[1];
+
   if (!token) {
     return res.status(401).json({ message: "Not authenticated" });
   }
@@ -11,8 +14,22 @@ export const authMiddleware = (req: any, res: any, next: any) => {
     req.user = decoded;
     next();
   } catch {
-    {
-      return res.status(401).json({ message: "Invalid token" });
-    }
+    return res.status(401).json({ message: "Invalid token" });
   }
+};
+
+export const roleMiddleware = (...allowedRoles: Role[]) => {
+  return (req: any, res: any, next: any) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    if (!allowedRoles.includes(req.user.role)) {
+      return res
+        .status(403)
+        .json({ message: "Access forbidden: insufficient permissions" });
+    }
+
+    next();
+  };
 };

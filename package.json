@@ -104,7 +104,8 @@
     "test:coverage": "jest --coverage",
     "dev": "nodemon --exec tsx src/index.ts",
     "start": "tsx src/index.ts",
-    "build": "echo 'No build step for backend'"
+    "build": "echo 'No build step for backend'",
+    "create-admin": "tsx prisma/seedAdmin.ts"
   },
   "keywords": [],
   "author": "",
