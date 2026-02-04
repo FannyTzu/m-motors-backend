@@ -9,7 +9,7 @@ datasource db {
 //ENUMS
 
 enum Role {
-  client
+  user
   admin
 }
 
@@ -56,7 +56,7 @@ model User {
   city          String?
   zip_code      String?  @db.VarChar(5)
   country       String?  @default("France")
-  role          Role     @default(client)
+  role          Role     @default(user)
   is_active     Boolean  @default(true)
   created_at    DateTime @default(now())
 
