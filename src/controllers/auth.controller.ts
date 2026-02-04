@@ -48,7 +48,11 @@ export const authController = (prisma: PrismaClient) => {
         });
 
         res.status(200).json({
-          user: { id: result.id, email: result.email },
+          user: {
+            id: result.id,
+            email: result.email,
+            role: result.role,
+          },
           accessToken: result.accessToken,
         });
       } catch (error) {
