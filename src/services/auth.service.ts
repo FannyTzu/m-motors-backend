@@ -83,6 +83,7 @@ export const loginUser = async (
   return {
     id: user.id,
     email: user.mail,
+    role: user.role,
     accessToken,
     refreshToken: unhashedRefreshToken,
   };

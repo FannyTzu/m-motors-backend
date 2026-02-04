@@ -9,7 +9,7 @@ jest.mock("jsonwebtoken");
 
 it("retoune 201 et le user si l'inscription réussit", async () => {
   (authService.registerUser as jest.Mock).mockResolvedValue({
-    newUser: { id: 1, mail: "test@example.com", role: "client" },
+    newUser: { id: 1, mail: "test@example.com", role: "user" },
     accessToken: "token",
     refreshToken: "refreshToken",
   });
@@ -20,7 +20,7 @@ it("retoune 201 et le user si l'inscription réussit", async () => {
   expect(response.body.user).toEqual({
     id: 1,
     mail: "test@example.com",
-    role: "client",
+    role: "user",
   });
   expect(response.body.accessToken).toBe("token");
 });
@@ -68,7 +68,7 @@ it("retourne 200 et le user si la connexion réussit avec token", async () => {
   (authService.loginUser as jest.Mock).mockResolvedValue({
     id: 1,
     email: "test@mail.com",
-    role: "client",
+    role: "user",
     accessToken: "token",
     refreshToken: "refreshToken",
   });
@@ -78,7 +78,11 @@ it("retourne 200 et le user si la connexion réussit avec token", async () => {
     .send({ email: "test@mail.com", password: "password123" });
 
   expect(res.status).toBe(200);
-  expect(res.body.user).toEqual({ id: 1, email: "test@mail.com" });
+  expect(res.body.user).toEqual({
+    id: 1,
+    email: "test@mail.com",
+    role: "user",
+  });
 });
 it("retourne 401 si req.user est absent", async () => {
   const res = await request(app).get("/auth/me");

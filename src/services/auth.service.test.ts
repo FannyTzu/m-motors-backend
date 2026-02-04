@@ -40,7 +40,7 @@ describe("registerUser", () => {
     prismaMock.user.create.mockResolvedValue({
       id: 1,
       mail: "test@example.com",
-      role: "client",
+      role: "user",
     });
     prismaMock.refreshToken.create.mockResolvedValue({
       id: 1,
@@ -60,7 +60,7 @@ describe("registerUser", () => {
     expect(result.newUser).toEqual({
       id: 1,
       mail: "test@example.com",
-      role: "client",
+      role: "user",
     });
     expect(result.accessToken).toBe("accessToken");
   });
@@ -92,7 +92,7 @@ describe("loginUser", () => {
       id: 1,
       mail: "test@example.com",
       password_hash: "HashedPassword",
-      role: "client",
+      role: "user",
     });
     prismaMock.refreshToken.create.mockResolvedValue({
       id: 1,
@@ -128,7 +128,7 @@ describe("refreshAccessToken", () => {
       {
         token_hash: "hashedToken",
         expires_at: new Date(Date.now() + 60_000),
-        user: { id: 1, role: "client" },
+        user: { id: 1, role: "user" },
       },
     ]);
     (bcrypt.compare as jest.Mock).mockResolvedValue(false);
@@ -143,7 +143,7 @@ describe("refreshAccessToken", () => {
       {
         token_hash: "hashedToken",
         expires_at: new Date(Date.now() + 60_000),
-        user: { id: 1, role: "client" },
+        user: { id: 1, role: "user" },
       },
     ]);
     (bcrypt.compare as jest.Mock).mockResolvedValue(true);
