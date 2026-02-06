@@ -42,6 +42,11 @@ enum PaymentStatus {
   pending
 }
 
+enum VehiclesTransmision {
+  automatique
+  manuelle
+}
+
 // TABLES
 
 
@@ -95,6 +100,7 @@ model Vehicle {
   type       VehiclesType
   image      String?
   price      Decimal       @db.Decimal(12, 2)
+  transmission VehiclesTransmision?
   status     VehiclesStatus @default(available)
   created_at DateTime      @default(now())
   orders     Order[]

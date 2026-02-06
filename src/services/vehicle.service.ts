@@ -1,8 +1,14 @@
-import { PrismaClient, VehiclesStatus, VehiclesType } from "@prisma/client";
+import {
+  PrismaClient,
+  VehiclesStatus,
+  VehiclesTransmision,
+  VehiclesType,
+} from "@prisma/client";
 
 export interface VehicleData {
   brand: string;
   model: string;
+  transmission?: VehiclesTransmision;
   year: number;
   energy: string;
   kms: number;
@@ -31,6 +37,7 @@ export const vehicleService = (prisma: PrismaClient) => {
           type: data.type,
           price: data.price.toString(),
           image: data.image,
+          transmission: data.transmission,
           status: data.status,
         },
       });

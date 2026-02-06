@@ -9,6 +9,7 @@ export const vehicleController = (prisma: PrismaClient) => {
         const {
           brand,
           model,
+          transmission,
           year,
           energy,
           kms,
@@ -42,6 +43,7 @@ export const vehicleController = (prisma: PrismaClient) => {
         const vehicle = await vehicleService(prisma).createVehicle({
           brand,
           model,
+          transmission,
           year,
           energy,
           kms,
