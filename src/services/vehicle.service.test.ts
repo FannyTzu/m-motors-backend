@@ -24,7 +24,7 @@ describe("vehicleService", () => {
       model: "serie 1",
       year: 2022,
       energy: "Essence",
-      kms: 5000,
+      km: 5000,
       color: "Blanc",
       place: 5,
       door: 4,
@@ -53,7 +53,7 @@ describe("vehicleService", () => {
           model: "serie 1",
           year: 2022,
           energy: "Essence",
-          kms: 5000,
+          km: 5000,
           color: "Blanc",
           place: 5,
           door: 4,
@@ -85,7 +85,7 @@ describe("vehicleService", () => {
         model: "serie 1",
         year: 2022,
         energy: "Essence",
-        kms: 5000,
+        km: 5000,
       } as VehicleData;
 
       try {

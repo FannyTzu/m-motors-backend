@@ -93,7 +93,7 @@ model Vehicle {
   model      String
   year       Int
   energy     String
-  kms        Int
+  km         Int
   color      String
   place      Int
   door       Int

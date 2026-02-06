@@ -11,7 +11,7 @@ export interface VehicleData {
   transmission?: VehiclesTransmision;
   year: number;
   energy: string;
-  kms: number;
+  km: number;
   color: string;
   place: number;
   door: number;
@@ -30,7 +30,7 @@ export const vehicleService = (prisma: PrismaClient) => {
           model: data.model,
           year: data.year,
           energy: data.energy,
-          kms: data.kms,
+          km: data.km,
           color: data.color,
           place: data.place,
           door: data.door,
@@ -51,7 +51,7 @@ export const vehicleService = (prisma: PrismaClient) => {
           model: data.model,
           year: data.year,
           energy: data.energy,
-          kms: data.kms,
+          km: data.km,
           color: data.color,
           place: data.place,
           door: data.door,

@@ -12,7 +12,7 @@ export const vehicleController = (prisma: PrismaClient) => {
           transmission,
           year,
           energy,
-          kms,
+          km,
           color,
           place,
           door,
@@ -27,7 +27,7 @@ export const vehicleController = (prisma: PrismaClient) => {
           !model ||
           !year ||
           !energy ||
-          !kms ||
+          !km ||
           !color ||
           !place ||
           !door ||
@@ -46,7 +46,7 @@ export const vehicleController = (prisma: PrismaClient) => {
           transmission,
           year,
           energy,
-          kms,
+          km,
           color,
           place,
           door,
@@ -69,7 +69,7 @@ export const vehicleController = (prisma: PrismaClient) => {
           transmission,
           year,
           energy,
-          kms,
+          km,
           color,
           place,
           door,
@@ -85,7 +85,7 @@ export const vehicleController = (prisma: PrismaClient) => {
           transmission,
           year,
           energy,
-          kms,
+          km,
           color,
           place,
           door,

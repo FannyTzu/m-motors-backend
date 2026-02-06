@@ -20,7 +20,7 @@ describe("vehicleController", () => {
       model: "Serie 1",
       year: 2023,
       energy: "Essence",
-      kms: 5000,
+      km: 5000,
       color: "Blanc",
       place: 5,
       door: 4,
