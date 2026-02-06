@@ -43,8 +43,8 @@ enum PaymentStatus {
 }
 
 enum VehiclesTransmision {
-  automatique
-  manuelle
+  automatic
+  manual
 }
 
 // TABLES
