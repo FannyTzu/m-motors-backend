@@ -18,6 +18,7 @@ export interface VehicleData {
   type: VehiclesType;
   price: number;
   image?: string;
+  description?: string;
   status: VehiclesStatus;
 }
 
@@ -37,6 +38,7 @@ export const vehicleService = (prisma: PrismaClient) => {
           type: data.type,
           price: data.price.toString(),
           image: data.image,
+          description: data.description,
           transmission: data.transmission,
           status: data.status,
         },
@@ -58,6 +60,7 @@ export const vehicleService = (prisma: PrismaClient) => {
           type: data.type,
           price: data.price ? data.price.toString() : undefined,
           image: data.image,
+          description: data.description,
           transmission: data.transmission,
           status: data.status,
         },

@@ -31,6 +31,7 @@ describe("vehicleService", () => {
       type: VehiclesType.sale,
       price: 15000,
       image: "image.jpg",
+      description: "c'est un description",
       transmission: VehiclesTransmision.automatic,
       status: VehiclesStatus.available,
     };
@@ -61,6 +62,7 @@ describe("vehicleService", () => {
           price: "15000",
           image: "image.jpg",
           transmission: "automatic",
+          description: "c'est un description",
           status: "available",
         },
       });

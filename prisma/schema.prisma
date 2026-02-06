@@ -99,6 +99,7 @@ model Vehicle {
   door       Int
   type       VehiclesType
   image      String?
+  description String?
   price      Decimal       @db.Decimal(12, 2)
   transmission VehiclesTransmision?
   status     VehiclesStatus @default(available)

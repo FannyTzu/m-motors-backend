@@ -19,6 +19,7 @@ export const vehicleController = (prisma: PrismaClient) => {
           type,
           price,
           image,
+          description,
           status,
         } = req.body;
 
@@ -52,6 +53,7 @@ export const vehicleController = (prisma: PrismaClient) => {
           door,
           type,
           price,
+          description,
           image,
           status,
         });
@@ -76,6 +78,7 @@ export const vehicleController = (prisma: PrismaClient) => {
           type,
           price,
           image,
+          description,
           status,
         } = req.body;
 
@@ -92,6 +95,7 @@ export const vehicleController = (prisma: PrismaClient) => {
           type,
           price,
           image,
+          description,
           status,
         });
         res.status(200).json(vehicle);
