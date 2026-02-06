@@ -4,6 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 import { createAuthRoutes } from "./routes/auth.routes";
+import { createVehicleRoutes } from "./routes/vehicle.routes";
 import cookieParser from "cookie-parser";
 import "dotenv/config";
 
@@ -30,3 +31,4 @@ app.get("/", (req, res) => {
 });
 
 app.use("/auth", createAuthRoutes(prisma));
+app.use("/vehicle", createVehicleRoutes(prisma));
