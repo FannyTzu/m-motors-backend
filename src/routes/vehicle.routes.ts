@@ -8,5 +8,10 @@ export const createVehicleRoutes = (prisma: PrismaClient) => {
 
   router.post("/create", controller.createVehicle);
 
+  router.get("/", controller.getAllVehicles);
+
+  router.get("/:id", controller.getVehicleById);
+
+  router.put("/:id", controller.updateVehicle);
   return router;
 };

@@ -24,13 +24,14 @@ describe("vehicleService", () => {
       model: "serie 1",
       year: 2022,
       energy: "Essence",
-      kms: 5000,
+      km: 5000,
       color: "Blanc",
       place: 5,
       door: 4,
       type: VehiclesType.sale,
       price: 15000,
       image: "image.jpg",
+      description: "c'est un description",
       transmission: VehiclesTransmision.automatic,
       status: VehiclesStatus.available,
     };
@@ -53,7 +54,7 @@ describe("vehicleService", () => {
           model: "serie 1",
           year: 2022,
           energy: "Essence",
-          kms: 5000,
+          km: 5000,
           color: "Blanc",
           place: 5,
           door: 4,
@@ -61,6 +62,7 @@ describe("vehicleService", () => {
           price: "15000",
           image: "image.jpg",
           transmission: "automatic",
+          description: "c'est un description",
           status: "available",
         },
       });
@@ -85,7 +87,7 @@ describe("vehicleService", () => {
         model: "serie 1",
         year: 2022,
         energy: "Essence",
-        kms: 5000,
+        km: 5000,
       } as VehicleData;
 
       try {
