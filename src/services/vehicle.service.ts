@@ -43,5 +43,36 @@ export const vehicleService = (prisma: PrismaClient) => {
       });
       return vehicle;
     },
+    updateVehicle: async (id: number, data: Partial<VehicleData>) => {
+      const vehicle = await prisma.vehicle.update({
+        where: { id },
+        data: {
+          brand: data.brand,
+          model: data.model,
+          year: data.year,
+          energy: data.energy,
+          kms: data.kms,
+          color: data.color,
+          place: data.place,
+          door: data.door,
+          type: data.type,
+          price: data.price ? data.price.toString() : undefined,
+          image: data.image,
+          transmission: data.transmission,
+          status: data.status,
+        },
+      });
+      return vehicle;
+    },
+    getVehicleById: async (id: number) => {
+      const vehicle = await prisma.vehicle.findUnique({
+        where: { id },
+      });
+      return vehicle;
+    },
+    getAllVehicles: async () => {
+      const vehicles = await prisma.vehicle.findMany();
+      return vehicles;
+    },
   };
 };
