@@ -77,5 +77,10 @@ export const vehicleService = (prisma: PrismaClient) => {
       const vehicles = await prisma.vehicle.findMany();
       return vehicles;
     },
+    deleteVehicleById: async (id: number) => {
+      await prisma.vehicle.delete({
+        where: { id },
+      });
+    },
   };
 };
