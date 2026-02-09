@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import { vehicleService } from "../services/vehicle.service";
-import { get } from "http";
 
 export const vehicleController = (prisma: PrismaClient) => {
   return {

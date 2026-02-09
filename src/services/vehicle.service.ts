@@ -4,7 +4,6 @@ import {
   VehiclesTransmision,
   VehiclesType,
 } from "@prisma/client";
-import { get } from "http";
 
 export interface VehicleData {
   brand: string;
