@@ -123,6 +123,17 @@ export const vehicleController = (prisma: PrismaClient) => {
         res.status(400).json({ error: (error as Error).message });
       }
     },
+    getVehiclesByType: async (req: Request, res: Response) => {
+      try {
+        const { type } = req.params;
+        const vehicles = await vehicleService(prisma).getVehiclesByType(
+          type as any,
+        );
+        res.status(200).json(vehicles);
+      } catch (error) {
+        res.status(400).json({ error: (error as Error).message });
+      }
+    },
     deleteVehicleById: async (req: Request, res: Response) => {
       try {
         const { id } = req.params;

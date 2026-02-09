@@ -12,6 +12,8 @@ export const createVehicleRoutes = (prisma: PrismaClient) => {
 
   router.get("/:id", controller.getVehicleById);
 
+  router.get("/type/:type", controller.getVehiclesByType);
+
   router.put("/:id", controller.updateVehicle);
 
   router.delete("/:id", controller.deleteVehicleById);
