@@ -4,6 +4,7 @@ import {
   VehiclesTransmision,
   VehiclesType,
 } from "@prisma/client";
+import { get } from "http";
 
 export interface VehicleData {
   brand: string;
@@ -75,6 +76,12 @@ export const vehicleService = (prisma: PrismaClient) => {
     },
     getAllVehicles: async () => {
       const vehicles = await prisma.vehicle.findMany();
+      return vehicles;
+    },
+    getVehiclesByType: async (type: VehiclesType) => {
+      const vehicles = await prisma.vehicle.findMany({
+        where: { type },
+      });
       return vehicles;
     },
     deleteVehicleById: async (id: number) => {

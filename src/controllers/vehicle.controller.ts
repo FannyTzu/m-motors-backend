@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import { vehicleService } from "../services/vehicle.service";
+import { get } from "http";
 
 export const vehicleController = (prisma: PrismaClient) => {
   return {
@@ -118,6 +119,17 @@ export const vehicleController = (prisma: PrismaClient) => {
     getAllVehicles: async (req: Request, res: Response) => {
       try {
         const vehicles = await vehicleService(prisma).getAllVehicles();
+        res.status(200).json(vehicles);
+      } catch (error) {
+        res.status(400).json({ error: (error as Error).message });
+      }
+    },
+    getVehiclesByType: async (req: Request, res: Response) => {
+      try {
+        const { type } = req.params;
+        const vehicles = await vehicleService(prisma).getVehiclesByType(
+          type as any,
+        );
         res.status(200).json(vehicles);
       } catch (error) {
         res.status(400).json({ error: (error as Error).message });
