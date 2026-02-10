@@ -36,6 +36,7 @@ export const authController = (prisma: PrismaClient) => {
             mail: result.newUser.mail,
             role: result.newUser.role,
           },
+          accessToken: result.accessToken,
         });
       } catch (error) {
         res.status(400).json({ error: (error as Error).message });
@@ -106,7 +107,7 @@ export const authController = (prisma: PrismaClient) => {
         }
 
         const result = await refreshAccessToken(prisma, refreshToken);
-        
+
         res.cookie("access_token", result.accessToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
@@ -114,7 +115,7 @@ export const authController = (prisma: PrismaClient) => {
           maxAge: 15 * 60 * 1000,
         });
 
-        res.status(200).json({ success: true });
+        res.status(200).json({ accessToken: result.accessToken });
       } catch (error) {
         res.status(401).json({ error: (error as Error).message });
       }
