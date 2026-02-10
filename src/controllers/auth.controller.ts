@@ -16,6 +16,13 @@ export const authController = (prisma: PrismaClient) => {
           password,
         });
 
+        res.cookie("access_token", result.accessToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          maxAge: 15 * 60 * 1000,
+        });
+
         res.cookie("refresh_token", result.refreshToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
@@ -40,6 +47,13 @@ export const authController = (prisma: PrismaClient) => {
         const { email, password } = req.body;
         const result = await loginUser(prisma, email, password);
 
+        res.cookie("access_token", result.accessToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          maxAge: 15 * 60 * 1000,
+        });
+
         res.cookie("refresh_token", result.refreshToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
@@ -53,7 +67,6 @@ export const authController = (prisma: PrismaClient) => {
             email: result.email,
             role: result.role,
           },
-          accessToken: result.accessToken,
         });
       } catch (error) {
         res.status(400).json({ error: (error as Error).message });
@@ -76,6 +89,10 @@ export const authController = (prisma: PrismaClient) => {
       res.status(200).json({ user });
     },
     logout: (req: Request, res: Response) => {
+      res.clearCookie("access_token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+      });
       res.clearCookie("refresh_token", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
@@ -90,6 +107,14 @@ export const authController = (prisma: PrismaClient) => {
         }
 
         const result = await refreshAccessToken(prisma, refreshToken);
+
+        res.cookie("access_token", result.accessToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          maxAge: 15 * 60 * 1000,
+        });
+
         res.status(200).json({ accessToken: result.accessToken });
       } catch (error) {
         res.status(401).json({ error: (error as Error).message });

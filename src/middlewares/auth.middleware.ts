@@ -3,7 +3,7 @@ import { Role } from "@prisma/client";
 
 export const authMiddleware = (req: any, res: any, next: any) => {
   const authHeader = req.headers.authorization;
-  const token = authHeader?.split(" ")[1];
+  const token = authHeader?.split(" ")[1] || req.cookies.access_token;
 
   if (!token) {
     return res.status(401).json({ message: "Not authenticated" });
