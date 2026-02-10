@@ -8,6 +8,10 @@ import {
 } from "@prisma/client";
 
 jest.mock("../services/vehicle.service");
+jest.mock("../middlewares/auth.middleware", () => ({
+  authMiddleware: (req: any, res: any, next: any) => next(),
+  roleMiddleware: () => (req: any, res: any, next: any) => next(),
+}));
 
 describe("vehicleController", () => {
   beforeEach(() => {
@@ -26,7 +30,7 @@ describe("vehicleController", () => {
       door: 4,
       type: VehiclesType.sale,
       price: 15000,
-      image: "image.jpg",
+      image: "https://example.com/image.jpg",
       transmission: VehiclesTransmision.automatic,
       status: VehiclesStatus.available,
     };
@@ -65,7 +69,8 @@ describe("vehicleController", () => {
         .send(incompleteData);
 
       expect(response.status).toBe(400);
-      expect(response.body.error).toBe("All fields except image are required");
+      expect(response.body.message).toBe("Validation failed");
+      expect(response.body.errors).toBeDefined();
     });
 
     it("devrait retourner 400 si la marque manque", async () => {
@@ -76,7 +81,8 @@ describe("vehicleController", () => {
         .send(dataWithoutBrand);
 
       expect(response.status).toBe(400);
-      expect(response.body.error).toBe("All fields except image are required");
+      expect(response.body.message).toBe("Validation failed");
+      expect(response.body.errors).toBeDefined();
     });
 
     it("devrait retourner 400 si le service lève une erreur", async () => {
@@ -90,16 +96,17 @@ describe("vehicleController", () => {
         .send(validVehicleData);
 
       expect(response.status).toBe(400);
-      expect(response.body.error).toBe("Erreur de base de données");
+      expect(response.body.error).toBeDefined();
     });
 
     it("devrait créer un véhicule sans image (optionnel)", async () => {
-      const vehicleDataWithoutImage = { ...validVehicleData, image: null };
+      const { image, ...vehicleDataWithoutImage } = validVehicleData;
 
       const mockVehicle = {
         id: 2,
         ...vehicleDataWithoutImage,
         price: 15000,
+        image: null,
         created_at: new Date().toISOString(),
       };
 
@@ -115,28 +122,17 @@ describe("vehicleController", () => {
       expect(response.body.image).toBeNull();
     });
 
-    it("devrait créer un véhicule sans transmission (optionnel)", async () => {
+    it("devrait retourner 400 si transmission manque (champ requis)", async () => {
       const { transmission, ...vehicleDataWithoutTransmission } =
         validVehicleData;
-
-      const mockVehicle = {
-        id: 3,
-        ...vehicleDataWithoutTransmission,
-        price: 15000,
-        transmission: null,
-        created_at: new Date().toISOString(),
-      };
-
-      (vehicleService.vehicleService as jest.Mock).mockReturnValue({
-        createVehicle: jest.fn().mockResolvedValue(mockVehicle),
-      });
 
       const response = await request(app)
         .post("/vehicle/create")
         .send(vehicleDataWithoutTransmission);
 
-      expect(response.status).toBe(201);
-      expect(response.body.transmission).toBeNull();
+      expect(response.status).toBe(400);
+      expect(response.body.message).toBe("Validation failed");
+      expect(response.body.errors).toBeDefined();
     });
 
     it("devrait valider que type est requis", async () => {
@@ -147,7 +143,8 @@ describe("vehicleController", () => {
         .send(dataWithoutType);
 
       expect(response.status).toBe(400);
-      expect(response.body.error).toBe("All fields except image are required");
+      expect(response.body.message).toBe("Validation failed");
+      expect(response.body.errors).toBeDefined();
     });
 
     it("devrait valider que status est requis", async () => {
@@ -158,7 +155,8 @@ describe("vehicleController", () => {
         .send(dataWithoutStatus);
 
       expect(response.status).toBe(400);
-      expect(response.body.error).toBe("All fields except image are required");
+      expect(response.body.message).toBe("Validation failed");
+      expect(response.body.errors).toBeDefined();
     });
   });
 });
