@@ -21,7 +21,12 @@ export const createVehicleSchema = z.object({
   transmission: z.enum(["automatic", "manual"] as const),
   status: z.enum(["available", "reserved", "sold"] as const),
   price: z.number().positive("Price must be a positive number"),
-  image: z.string().url("Image must be a valid URL").optional(),
+  image: z
+    .string()
+    .url("Image must be a valid URL")
+    .optional()
+    .or(z.literal(""))
+    .transform((val) => (val === "" ? undefined : val)),
   description: z.string().optional(),
 });
 
