@@ -261,8 +261,8 @@ describe("vehicleService", () => {
         },
         {
           id: 2,
-          brand: "BMW",
-          model: "X5",
+          brand: "BMX",
+          model: "P5",
           year: 2023,
           energy: "Diesel",
           km: 1000,
