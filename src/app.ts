@@ -31,10 +31,14 @@ app.get("/", (req, res) => {
   res.json({ message: "M-Motors API is running" });
 });
 
-// Route test Sentry
-app.get("/debug-sentry", (req, res) => {
-  throw new Error("Test Sentry - Erreur volontaire pour tester le monitoring");
-});
+// test Sentry (TO DO : delete before production)
+if (process.env.NODE_ENV !== "production") {
+  app.get("/debug-sentry", (req, res) => {
+    throw new Error(
+      "Test Sentry - Erreur volontaire pour tester le monitoring",
+    );
+  });
+}
 
 app.use("/auth", createAuthRoutes(prisma));
 app.use("/vehicle", createVehicleRoutes(prisma));
@@ -47,6 +51,16 @@ app.use(function onError(
   res: express.Response,
   next: express.NextFunction,
 ) {
-  res.statusCode = 500;
-  res.json({ error: "Internal server error", eventId: res.locals.errorId });
+  console.error("Error:", err);
+
+  const statusCode = res.statusCode !== 200 ? res.statusCode : 500;
+
+  res.status(statusCode).json({
+    error:
+      process.env.NODE_ENV === "production"
+        ? "Internal server error"
+        : err.message,
+    eventId: res.locals.errorId,
+    ...(process.env.NODE_ENV !== "production" && { stack: err.stack }),
+  });
 });
