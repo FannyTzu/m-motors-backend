@@ -1,3 +1,4 @@
+import "dotenv/config";
 import "./instrument";
 import { app } from "./app";
 

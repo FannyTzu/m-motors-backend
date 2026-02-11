@@ -6,7 +6,6 @@ import { Pool } from "pg";
 import { createAuthRoutes } from "./routes/auth.routes";
 import { createVehicleRoutes } from "./routes/vehicle.routes";
 import cookieParser from "cookie-parser";
-import "dotenv/config";
 import * as Sentry from "@sentry/node";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -31,14 +30,11 @@ app.get("/", (req, res) => {
   res.json({ message: "M-Motors API is running" });
 });
 
-// test Sentry (TO DO : delete before production)
-if (process.env.NODE_ENV !== "production") {
-  app.get("/debug-sentry", (req, res) => {
-    throw new Error(
-      "Test Sentry - Erreur volontaire pour tester le monitoring",
-    );
-  });
-}
+// Test Sentry - (todo delete this route in production)
+app.get("/debug-sentry", (req, res) => {
+  console.log("🧪 Test Sentry avec throw...");
+  throw new Error("Test Sentry - Erreur volontaire pour tester le monitoring");
+});
 
 app.use("/auth", createAuthRoutes(prisma));
 app.use("/vehicle", createVehicleRoutes(prisma));
