@@ -5,72 +5,79 @@ import {
   loginUser,
   refreshAccessToken,
 } from "../services/auth.service";
+import { captureError } from "../utils/sentry";
 
 export const authController = (prisma: PrismaClient) => {
   return {
     register: async (req: Request, res: Response) => {
-      try {
-        const { email, password } = req.body;
-        const result = await registerUser(prisma, {
-          mail: email,
-          password,
-        });
+      const { email, password } = req.body;
+      const result = await registerUser(prisma, {
+        mail: email,
+        password,
+      });
 
-        res.cookie("access_token", result.accessToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-          maxAge: 15 * 60 * 1000,
-        });
+      // Track new registration (if app were real)
+      captureError(new Error(`User registered successfully: ${email}`), {
+        tags: {
+          feature: "auth",
+          operation: "register",
+          action: "success",
+        },
+        extra: {
+          userId: result.newUser.id,
+          email: result.newUser.mail,
+        },
+        level: "info",
+      });
 
-        res.cookie("refresh_token", result.refreshToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-          maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+      res.cookie("access_token", result.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 15 * 60 * 1000,
+      });
 
-        res.status(201).json({
-          user: {
-            id: result.newUser.id,
-            mail: result.newUser.mail,
-            role: result.newUser.role,
-          },
-          accessToken: result.accessToken,
-        });
-      } catch (error) {
-        res.status(400).json({ error: (error as Error).message });
-      }
+      res.cookie("refresh_token", result.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
+      res.status(201).json({
+        user: {
+          id: result.newUser.id,
+          mail: result.newUser.mail,
+          role: result.newUser.role,
+        },
+        accessToken: result.accessToken,
+      });
     },
     login: async (req: Request, res: Response) => {
-      try {
-        const { email, password } = req.body;
-        const result = await loginUser(prisma, email, password);
+      const { email, password } = req.body;
+      const result = await loginUser(prisma, email, password);
 
-        res.cookie("access_token", result.accessToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-          maxAge: 15 * 60 * 1000,
-        });
+      res.cookie("access_token", result.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 15 * 60 * 1000,
+      });
 
-        res.cookie("refresh_token", result.refreshToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-          maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+      res.cookie("refresh_token", result.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
 
-        res.status(200).json({
-          user: {
-            id: result.id,
-            email: result.email,
-            role: result.role,
-          },
-        });
-      } catch (error) {
-        res.status(400).json({ error: (error as Error).message });
-      }
+      res.status(200).json({
+        user: {
+          id: result.id,
+          email: result.email,
+          role: result.role,
+        },
+      });
     },
     me: async (req: Request, res: Response) => {
       if (!req.user) {
@@ -100,25 +107,21 @@ export const authController = (prisma: PrismaClient) => {
       res.status(200).json({ message: "Logged out successfully" });
     },
     refreshToken: async (req: Request, res: Response) => {
-      try {
-        const refreshToken = req.cookies.refresh_token;
-        if (!refreshToken) {
-          return res.status(401).json({ error: "Refresh token not found" });
-        }
-
-        const result = await refreshAccessToken(prisma, refreshToken);
-
-        res.cookie("access_token", result.accessToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-          maxAge: 15 * 60 * 1000,
-        });
-
-        res.status(200).json({ accessToken: result.accessToken });
-      } catch (error) {
-        res.status(401).json({ error: (error as Error).message });
+      const refreshToken = req.cookies.refresh_token;
+      if (!refreshToken) {
+        return res.status(401).json({ error: "Refresh token not found" });
       }
+
+      const result = await refreshAccessToken(prisma, refreshToken);
+
+      res.cookie("access_token", result.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 15 * 60 * 1000,
+      });
+
+      res.status(200).json({ accessToken: result.accessToken });
     },
   };
 };

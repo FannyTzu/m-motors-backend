@@ -146,3 +146,9 @@ vite.config.ts.timestamp-*
 
 # settings IDE
 settings.json
+
+# Doc Sentry
+SENTRY.md
+
+#monitoring
+MONITORING.md

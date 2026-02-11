@@ -21,6 +21,7 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
+    "@sentry/node": "^10.38.0",
     "@types/cors": "^2.8.19",
     "aws-ssl-profiles": "^1.1.2",
     "bcrypt": "^6.0.0",

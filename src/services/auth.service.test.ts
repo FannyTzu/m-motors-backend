@@ -21,7 +21,7 @@ describe("registerUser", () => {
     jest.clearAllMocks();
   });
 
-  it("throw une erreur si l'email est déjà utilisé", async () => {
+  it("throw error if email is already used", async () => {
     prismaMock.user.findUnique.mockResolvedValue({
       id: 1,
       mail: "test@example.com",
@@ -35,7 +35,7 @@ describe("registerUser", () => {
     ).rejects.toThrow("Cet email est déjà utilisé.");
   });
 
-  it("crée un nouvel utilisateur et retourne un token d'accès", async () => {
+  it("creates a new user and returns an access token", async () => {
     prismaMock.user.findUnique.mockResolvedValue(null);
     prismaMock.user.create.mockResolvedValue({
       id: 1,
@@ -70,13 +70,13 @@ describe("loginUser", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  it("throw une erreur si les identifiants sont invalides", async () => {
+  it("throw error if credentials are invalid", async () => {
     prismaMock.user.findUnique.mockResolvedValue(null);
     await expect(
       loginUser(prismaMock, "notgoduser@example.com", "password"),
     ).rejects.toThrow("Invalid credentials");
   });
-  it("throw une erreur si le mot de passe est incorrect", async () => {
+  it("throw error if password isn't correct", async () => {
     prismaMock.user.findUnique.mockResolvedValue({
       id: 1,
       mail: "test@example.com",
@@ -87,7 +87,7 @@ describe("loginUser", () => {
       loginUser(prismaMock, "test@example.com", "badpassword"),
     ).rejects.toThrow("Invalid credentials");
   });
-  it("retourne les informations de l'utilisateur si les identifiants sont valides", async () => {
+  it("returns user information if credentials are valid", async () => {
     prismaMock.user.findUnique.mockResolvedValue({
       id: 1,
       mail: "test@example.com",
@@ -117,13 +117,13 @@ describe("refreshAccessToken", () => {
     jest.clearAllMocks();
   });
 
-  it("throw une erreur si le refresh token est absent", async () => {
+  it("throw error if refresh token is absent", async () => {
     await expect(refreshAccessToken(prismaMock, "")).rejects.toThrow(
       "Refresh token is required",
     );
   });
 
-  it("throw une erreur si le refresh token est invalide", async () => {
+  it("throw error if refresh token is invalid", async () => {
     prismaMock.refreshToken.findMany.mockResolvedValue([
       {
         token_hash: "hashedToken",
@@ -138,7 +138,7 @@ describe("refreshAccessToken", () => {
     ).rejects.toThrow("Invalid or expired refresh token");
   });
 
-  it("retourne un access token si le refresh token est valide", async () => {
+  it("returns an access token if refresh token is valid", async () => {
     prismaMock.refreshToken.findMany.mockResolvedValue([
       {
         token_hash: "hashedToken",
