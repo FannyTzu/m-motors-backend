@@ -36,7 +36,7 @@ describe("vehicleService", () => {
       status: VehiclesStatus.available,
     };
 
-    it("crée le vehicule sans erreur et doit retourner les donnée du céhicules créé", async () => {
+    it("create vehicle without error and should return the created vehicle data", async () => {
       const mockVehicle = {
         id: 1,
         ...validVehicleData,
@@ -72,16 +72,16 @@ describe("vehicleService", () => {
       expect(result.brand).toBe("AAstra");
     });
 
-    it("devrait retourner une erreur si le serveur Prisma échoue", async () => {
-      const error = new Error("Erreur de base de données");
+    it("should return an error if the Prisma server fails", async () => {
+      const error = new Error("Database error");
       prismaMock.vehicle.create.mockRejectedValue(error);
 
       await expect(service.createVehicle(validVehicleData)).rejects.toThrow(
-        "Erreur de base de données",
+        "Database error",
       );
     });
 
-    it("devrait retourner une erreur si des champs obligatoires sont manquants", async () => {
+    it("should return an error if required fields are missing", async () => {
       const incompleteData = {
         brand: "AAstra",
         model: "serie 1",
@@ -97,7 +97,7 @@ describe("vehicleService", () => {
       }
     });
 
-    it("devrait créer un véhicule sans image (optionnel)", async () => {
+    it("should create a vehicle without image (optional)", async () => {
       const vehicleDataWithoutImage = { ...validVehicleData, image: undefined };
 
       const mockVehicle = {
@@ -114,7 +114,7 @@ describe("vehicleService", () => {
       expect(result.image).toBeUndefined();
     });
 
-    it("devrait créer un véhicule sans transmission (optionnel)", async () => {
+    it("should create a vehicle without transmission (optional)", async () => {
       const vehicleDataWithoutTransmission = {
         ...validVehicleData,
         transmission: undefined,
@@ -154,7 +154,7 @@ describe("vehicleService", () => {
       status: VehiclesStatus.available,
     };
 
-    it("met à jour le véhicule sans erreur et doit retourner les données du véhicule mis à jour", async () => {
+    it("updates vehicle without error and should return the updated vehicle data", async () => {
       const mockVehicle = {
         id: 1,
         ...validVehicleData,
@@ -190,18 +190,18 @@ describe("vehicleService", () => {
       expect(result.id).toBe(1);
     });
 
-    it("devrait retourner une erreur si le serveur Prisma échoue lors de la mise à jour", async () => {
-      const error = new Error("Erreur de base de données");
+    it("should return an error if the Prisma server fails during update", async () => {
+      const error = new Error("Database error");
       prismaMock.vehicle.update = jest.fn().mockRejectedValue(error);
 
       await expect(service.updateVehicle(1, { price: 16000 })).rejects.toThrow(
-        "Erreur de base de données",
+        "Database error",
       );
     });
   });
 
   describe("getVehicleById", () => {
-    it("devrait retourner un véhicule par ID", async () => {
+    it("should return vehicle by ID", async () => {
       const mockVehicle = {
         id: 1,
         brand: "AAstra",
@@ -230,7 +230,7 @@ describe("vehicleService", () => {
       expect(result).toEqual(mockVehicle);
     });
 
-    it("devrait retourner null si le véhicule n'existe pas", async () => {
+    it("should return null if the vehicle does not exist", async () => {
       prismaMock.vehicle.findUnique = jest.fn().mockResolvedValue(null);
 
       const result = await service.getVehicleById(999);
@@ -240,7 +240,7 @@ describe("vehicleService", () => {
   });
 
   describe("getAllVehicles", () => {
-    it("devrait retourner tous les véhicules", async () => {
+    it("should return all vehicles", async () => {
       const mockVehicles = [
         {
           id: 1,
@@ -287,7 +287,7 @@ describe("vehicleService", () => {
       expect(result.length).toBe(2);
     });
 
-    it("devrait retourner un tableau vide s'il n'y a aucun véhicule", async () => {
+    it("should return an empty array if there are no vehicles", async () => {
       prismaMock.vehicle.findMany = jest.fn().mockResolvedValue([]);
 
       const result = await service.getAllVehicles();
@@ -297,7 +297,7 @@ describe("vehicleService", () => {
   });
 
   describe("getVehiclesByType", () => {
-    it("devrait retourner les véhicules par type", async () => {
+    it("should return vehicles by type", async () => {
       const mockVehicles = [
         {
           id: 1,
@@ -331,7 +331,7 @@ describe("vehicleService", () => {
   });
 
   describe("deleteVehicleById", () => {
-    it("devrait supprimer un véhicule par ID", async () => {
+    it("should delete a vehicle by ID", async () => {
       prismaMock.vehicle.delete = jest.fn().mockResolvedValue({});
 
       await service.deleteVehicleById(1);
@@ -341,12 +341,12 @@ describe("vehicleService", () => {
       });
     });
 
-    it("devrait retourner une erreur si le véhicule n'existe pas", async () => {
-      const error = new Error("Véhicule non trouvé");
+    it("should return an error if the vehicle does not exist", async () => {
+      const error = new Error("VVehicle not found");
       prismaMock.vehicle.delete = jest.fn().mockRejectedValue(error);
 
       await expect(service.deleteVehicleById(999)).rejects.toThrow(
-        "Véhicule non trouvé",
+        "Vehicle not found",
       );
     });
   });

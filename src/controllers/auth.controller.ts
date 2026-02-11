@@ -5,6 +5,7 @@ import {
   loginUser,
   refreshAccessToken,
 } from "../services/auth.service";
+import { captureError } from "../utils/sentry";
 
 export const authController = (prisma: PrismaClient) => {
   return {
@@ -13,6 +14,20 @@ export const authController = (prisma: PrismaClient) => {
       const result = await registerUser(prisma, {
         mail: email,
         password,
+      });
+
+      // Track new registration (if app were real)
+      captureError(new Error(`User registered successfully: ${email}`), {
+        tags: {
+          feature: "auth",
+          operation: "register",
+          action: "success",
+        },
+        extra: {
+          userId: result.newUser.id,
+          email: result.newUser.mail,
+        },
+        level: "info",
       });
 
       res.cookie("access_token", result.accessToken, {

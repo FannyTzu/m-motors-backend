@@ -7,7 +7,7 @@ jest.mock("../../src/services/auth.service");
 
 jest.mock("jsonwebtoken");
 
-it("retoune 201 et le user si l'inscription réussit", async () => {
+it("return 201 and user if registration succeeds", async () => {
   (authService.registerUser as jest.Mock).mockResolvedValue({
     newUser: { id: 1, mail: "test@example.com", role: "user" },
     accessToken: "token",
@@ -24,7 +24,7 @@ it("retoune 201 et le user si l'inscription réussit", async () => {
   });
   expect(response.body.accessToken).toBe("token");
 });
-it("retourne 500 si le service lève une erreur", async () => {
+it("return 500 if service throws an error", async () => {
   (authService.registerUser as jest.Mock).mockRejectedValue(
     new Error("Cet email est déjà utilisé."),
   );
@@ -37,7 +37,7 @@ it("retourne 500 si le service lève une erreur", async () => {
   expect(res.body.error).toBe("Cet email est déjà utilisé.");
 });
 
-it("retoune 200 et le user si la connexion réussit", async () => {
+it("return 200 and user if login succeeds", async () => {
   (authService.loginUser as jest.Mock).mockResolvedValue({
     id: 1,
     mail: "test@example.com",
@@ -52,7 +52,7 @@ it("retoune 200 et le user si la connexion réussit", async () => {
   expect(response.status).toBe(200);
   expect(response.headers["set-cookie"]).toBeDefined();
 });
-it("retourne 400 si le login échoue", async () => {
+it("return 400 if login fails", async () => {
   (authService.loginUser as jest.Mock).mockRejectedValue(
     new Error("Invalid credentials"),
   );
@@ -63,7 +63,7 @@ it("retourne 400 si le login échoue", async () => {
 
   expect(res.status).toBe(400);
 });
-it("retourne 200 et le user si la connexion réussit avec token", async () => {
+it("return 200 and user if login succeeds with token", async () => {
   process.env.JWT_ACCESS_SECRET = "test-secret";
   (authService.loginUser as jest.Mock).mockResolvedValue({
     id: 1,
@@ -84,18 +84,18 @@ it("retourne 200 et le user si la connexion réussit avec token", async () => {
     role: "user",
   });
 });
-it("retourne 401 si req.user est absent", async () => {
+it("return 401 if req.user is absent", async () => {
   const res = await request(app).get("/auth/me");
   expect(res.status).toBe(401);
 });
 
-it("retourne 401 si refresh_token est absent", async () => {
+it("return 401 if refresh_token is absent", async () => {
   const res = await request(app).post("/auth/refresh-token");
   expect(res.status).toBe(401);
   expect(res.body.error).toBe("Refresh token not found");
 });
 
-it("retourne 200 et un accessToken si refresh_token est valide", async () => {
+it("return 200 and an accessToken if refresh_token is valid", async () => {
   (authService.refreshAccessToken as jest.Mock).mockResolvedValue({
     accessToken: "newAccessToken",
   });
