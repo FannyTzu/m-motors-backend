@@ -49,14 +49,18 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5433/testdb
           JWT_ACCESS_SECRET: test-secret-key-for-ci
+          JWT_REFRESH_SECRET: test-secret-refresh-key-for-ci
           NODE_ENV: test
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 
       - name: Générer le rapport de couverture
         run: npm run test:coverage
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5433/testdb
           JWT_ACCESS_SECRET: test-secret-key-for-ci
+          JWT_REFRESH_SECRET: test-secret-refresh-key-for-ci
           NODE_ENV: test
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
@@ -67,3 +71,5 @@ jobs:
 
       - name: Build du projet
         run: npm run build
+        env:
+          NODE_ENV: production
