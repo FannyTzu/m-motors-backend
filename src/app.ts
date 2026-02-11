@@ -5,6 +5,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 import { createAuthRoutes } from "./routes/auth.routes";
 import { createVehicleRoutes } from "./routes/vehicle.routes";
+import { createHealthRoutes } from "./routes/health.routes";
 import cookieParser from "cookie-parser";
 import * as Sentry from "@sentry/node";
 
@@ -29,6 +30,9 @@ app.use(cookieParser());
 app.get("/", (req, res) => {
   res.json({ message: "M-Motors API is running" });
 });
+
+// Health & Monitoring Routes
+app.use("/", createHealthRoutes(prisma));
 
 // Test Sentry - (todo delete this route in production)
 app.get("/debug-sentry", (req, res) => {
