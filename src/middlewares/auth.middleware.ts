@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { Role } from "@prisma/client";
+import * as Sentry from "@sentry/node";
 
 export const authMiddleware = (req: any, res: any, next: any) => {
   const authHeader = req.headers.authorization;
@@ -10,8 +11,15 @@ export const authMiddleware = (req: any, res: any, next: any) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET!);
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as any;
     req.user = decoded;
+
+    Sentry.setUser({
+      id: decoded.userId,
+      email: decoded.email,
+      role: decoded.role,
+    });
+
     next();
   } catch {
     return res.status(401).json({ message: "Invalid token" });

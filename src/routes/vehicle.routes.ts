@@ -7,6 +7,7 @@ import {
   createVehicleSchema,
   updateVehicleSchema,
 } from "../schemas/vehicle.schema";
+import { catchAsync } from "../utils/sentry";
 
 export const createVehicleRoutes = (prisma: PrismaClient) => {
   const router = Router();
@@ -17,28 +18,28 @@ export const createVehicleRoutes = (prisma: PrismaClient) => {
     validateSchema(createVehicleSchema),
     authMiddleware,
     roleMiddleware(Role.admin),
-    controller.createVehicle,
+    catchAsync(controller.createVehicle),
   );
 
-  router.get("/", controller.getAllVehicles);
+  router.get("/", catchAsync(controller.getAllVehicles));
 
-  router.get("/:id", controller.getVehicleById);
+  router.get("/:id", catchAsync(controller.getVehicleById));
 
-  router.get("/type/:type", controller.getVehiclesByType);
+  router.get("/type/:type", catchAsync(controller.getVehiclesByType));
 
   router.put(
     "/:id",
     validateSchema(updateVehicleSchema),
     authMiddleware,
     roleMiddleware(Role.admin),
-    controller.updateVehicle,
+    catchAsync(controller.updateVehicle),
   );
 
   router.delete(
     "/:id",
     authMiddleware,
     roleMiddleware(Role.admin),
-    controller.deleteVehicleById,
+    catchAsync(controller.deleteVehicleById),
   );
 
   return router;

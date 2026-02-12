@@ -35,7 +35,7 @@ describe("vehicleController", () => {
       status: VehiclesStatus.available,
     };
 
-    it("devrait créer un véhicule et retourner 201 avec les données", async () => {
+    it("should create vehicle and return 201 with data", async () => {
       const mockVehicle = {
         id: 1,
         ...validVehicleData,
@@ -57,7 +57,7 @@ describe("vehicleController", () => {
       expect(response.body.brand).toBe("Aastra");
     });
 
-    it("devrait retourner 400 si des champs obligatoires manquent", async () => {
+    it("should return 400 if required fields are missing", async () => {
       const incompleteData = {
         brand: "Aastra",
         model: "Serie 1",
@@ -73,7 +73,7 @@ describe("vehicleController", () => {
       expect(response.body.errors).toBeDefined();
     });
 
-    it("devrait retourner 400 si la marque manque", async () => {
+    it("should return 400 if brand is missing", async () => {
       const { brand, ...dataWithoutBrand } = validVehicleData;
 
       const response = await request(app)
@@ -85,8 +85,8 @@ describe("vehicleController", () => {
       expect(response.body.errors).toBeDefined();
     });
 
-    it("devrait retourner 400 si le service lève une erreur", async () => {
-      const error = new Error("Erreur de base de données");
+    it("should return 500 if the service throws an error", async () => {
+      const error = new Error("Database error");
       (vehicleService.vehicleService as jest.Mock).mockReturnValue({
         createVehicle: jest.fn().mockRejectedValue(error),
       });
@@ -95,11 +95,11 @@ describe("vehicleController", () => {
         .post("/vehicle/create")
         .send(validVehicleData);
 
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(500);
       expect(response.body.error).toBeDefined();
     });
 
-    it("devrait créer un véhicule sans image (optionnel)", async () => {
+    it("should create a vehicle without image (optional)", async () => {
       const { image, ...vehicleDataWithoutImage } = validVehicleData;
 
       const mockVehicle = {
@@ -122,7 +122,7 @@ describe("vehicleController", () => {
       expect(response.body.image).toBeNull();
     });
 
-    it("devrait valider que type doit être défini", async () => {
+    it("should validate that type must be defined", async () => {
       const { type, ...dataWithoutType } = validVehicleData;
 
       const response = await request(app)
@@ -134,7 +134,7 @@ describe("vehicleController", () => {
       expect(response.body.errors).toBeDefined();
     });
 
-    it("devrait valider que status doit être défini", async () => {
+    it("should validate that status must be defined", async () => {
       const { status, ...dataWithoutStatus } = validVehicleData;
 
       const response = await request(app)
@@ -147,7 +147,7 @@ describe("vehicleController", () => {
     });
   });
   describe("GET /vehicle/", () => {
-    it("devrait retourner une liste de véhicules", async () => {
+    it("should return a list of vehicles", async () => {
       const mockVehicles = [
         {
           id: 1,
@@ -177,20 +177,20 @@ describe("vehicleController", () => {
       expect(response.body).toEqual(mockVehicles);
     });
 
-    it("devrait retourner 400 si le service lève une erreur à la récupération de tous les véhicules", async () => {
-      const error = new Error("Erreur de base de données");
+    it("should return 500 if the service throws an error when fetching all vehicles", async () => {
+      const error = new Error("Database error");
       (vehicleService.vehicleService as jest.Mock).mockReturnValue({
         getAllVehicles: jest.fn().mockRejectedValue(error),
       });
 
       const response = await request(app).get("/vehicle/");
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(500);
       expect(response.body.error).toBeDefined();
     });
   });
 
   describe("GET /vehicle/:id", () => {
-    it("devrait retourner un véhicule par ID", async () => {
+    it("should return a vehicle by ID", async () => {
       const mockVehicle = {
         id: 1,
         brand: "Aastra",
@@ -219,7 +219,7 @@ describe("vehicleController", () => {
       expect(response.body.id).toBe(1);
     });
 
-    it("devrait retourner 404 si le véhicule n'existe pas", async () => {
+    it("should return 404 if the vehicle doesn't exist", async () => {
       (vehicleService.vehicleService as jest.Mock).mockReturnValue({
         getVehicleById: jest.fn().mockResolvedValue(null),
       });
@@ -229,20 +229,20 @@ describe("vehicleController", () => {
       expect(response.body.error).toBe("Vehicle not found");
     });
 
-    it("devrait retourner 400 si le service lève une erreur", async () => {
-      const error = new Error("Erreur de base de données");
+    it("should return 500 if the service throws an error", async () => {
+      const error = new Error("Database error");
       (vehicleService.vehicleService as jest.Mock).mockReturnValue({
         getVehicleById: jest.fn().mockRejectedValue(error),
       });
 
       const response = await request(app).get("/vehicle/1");
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(500);
       expect(response.body.error).toBeDefined();
     });
   });
 
   describe("GET /vehicle/type/:type", () => {
-    it("devrait retourner les véhicules par type", async () => {
+    it("should return vehicles by type", async () => {
       const mockVehicles = [
         {
           id: 1,
@@ -273,7 +273,7 @@ describe("vehicleController", () => {
       expect(response.body[0].type).toBe(VehiclesType.sale);
     });
 
-    it("devrait retourner un tableau vide si aucun véhicule du type n'existe", async () => {
+    it("should return an empty array if no vehicles of the type exist", async () => {
       (vehicleService.vehicleService as jest.Mock).mockReturnValue({
         getVehiclesByType: jest.fn().mockResolvedValue([]),
       });
@@ -283,14 +283,14 @@ describe("vehicleController", () => {
       expect(response.body).toEqual([]);
     });
 
-    it("devrait retourner 400 si le service lève une erreur", async () => {
-      const error = new Error("Erreur de base de données");
+    it("should return 500 if the service throws an error", async () => {
+      const error = new Error("Database error");
       (vehicleService.vehicleService as jest.Mock).mockReturnValue({
         getVehiclesByType: jest.fn().mockRejectedValue(error),
       });
 
       const response = await request(app).get("/vehicle/type/sale");
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(500);
       expect(response.body.error).toBeDefined();
     });
   });
@@ -301,7 +301,7 @@ describe("vehicleController", () => {
       km: 6000,
     };
 
-    it("devrait mettre à jour un véhicule et retourner 200 avec les données mises à jour", async () => {
+    it("should update vehicle and return 200 with the updated data", async () => {
       const mockVehicle = {
         id: 1,
         brand: "Aastra",
@@ -332,21 +332,21 @@ describe("vehicleController", () => {
       expect(response.body.km).toBe(6000);
     });
 
-    it("devrait retourner 400 si le service lève une erreur lors de la mise à jour", async () => {
-      const error = new Error("Erreur de base de données");
+    it("should return 500 if the service throws an error during update", async () => {
+      const error = new Error("Database error");
       (vehicleService.vehicleService as jest.Mock).mockReturnValue({
         updateVehicle: jest.fn().mockRejectedValue(error),
       });
 
       const response = await request(app).put("/vehicle/1").send(updateData);
 
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(500);
       expect(response.body.error).toBeDefined();
     });
   });
 
   describe("DELETE /vehicle/:id", () => {
-    it("devrait supprimer un véhicule et retourner 204", async () => {
+    it("should delete vehicle and return 204", async () => {
       (vehicleService.vehicleService as jest.Mock).mockReturnValue({
         deleteVehicleById: jest.fn().mockResolvedValue(undefined),
       });
@@ -356,15 +356,15 @@ describe("vehicleController", () => {
       expect(response.status).toBe(204);
     });
 
-    it("devrait retourner 400 si le service lève une erreur lors de la suppression", async () => {
-      const error = new Error("Véhicule non trouvé");
+    it("should return 500 if the service throws an error during delete", async () => {
+      const error = new Error("VVehicle not found");
       (vehicleService.vehicleService as jest.Mock).mockReturnValue({
         deleteVehicleById: jest.fn().mockRejectedValue(error),
       });
 
       const response = await request(app).delete("/vehicle/999");
 
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(500);
       expect(response.body.error).toBeDefined();
     });
   });
