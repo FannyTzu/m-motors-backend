@@ -5,79 +5,123 @@ import {
   loginUser,
   refreshAccessToken,
 } from "../services/auth.service";
-import { captureError } from "../utils/sentry";
+import { addBreadcrumb, captureError } from "../utils/sentry";
 
 export const authController = (prisma: PrismaClient) => {
   return {
     register: async (req: Request, res: Response) => {
       const { email, password } = req.body;
-      const result = await registerUser(prisma, {
-        mail: email,
-        password,
-      });
+      try {
+        const result = await registerUser(prisma, {
+          mail: email,
+          password,
+        });
 
-      // Track new registration (if app were real)
-      captureError(new Error(`User registered successfully: ${email}`), {
-        tags: {
-          feature: "auth",
-          operation: "register",
-          action: "success",
-        },
-        extra: {
+        addBreadcrumb("User registered", "auth", {
           userId: result.newUser.id,
           email: result.newUser.mail,
-        },
-        level: "info",
-      });
+        });
 
-      res.cookie("access_token", result.accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 15 * 60 * 1000,
-      });
+        res.cookie("access_token", result.accessToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          maxAge: 15 * 60 * 1000,
+        });
 
-      res.cookie("refresh_token", result.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      });
+        res.cookie("refresh_token", result.refreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
 
-      res.status(201).json({
-        user: {
-          id: result.newUser.id,
-          mail: result.newUser.mail,
-          role: result.newUser.role,
-        },
-        accessToken: result.accessToken,
-      });
+        res.status(201).json({
+          user: {
+            id: result.newUser.id,
+            mail: result.newUser.mail,
+            role: result.newUser.role,
+          },
+          accessToken: result.accessToken,
+        });
+      } catch (error) {
+        const err = error instanceof Error ? error : new Error("Unknown error");
+        if (err.message === "Cet email est déjà utilisé.") {
+          return res.status(409).json({ error: err.message });
+        }
+
+        captureError(err, {
+          tags: {
+            feature: "auth",
+            operation: "register",
+          },
+          extra: {
+            email,
+          },
+        });
+
+        return res.status(500).json({
+          error:
+            process.env.NODE_ENV === "production"
+              ? "Internal server error"
+              : err.message,
+        });
+      }
     },
     login: async (req: Request, res: Response) => {
       const { email, password } = req.body;
-      const result = await loginUser(prisma, email, password);
+      try {
+        const result = await loginUser(prisma, email, password);
 
-      res.cookie("access_token", result.accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 15 * 60 * 1000,
-      });
-
-      res.cookie("refresh_token", result.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      });
-
-      res.status(200).json({
-        user: {
-          id: result.id,
+        addBreadcrumb("User logged in", "auth", {
+          userId: result.id,
           email: result.email,
-          role: result.role,
-        },
-      });
+        });
+
+        res.cookie("access_token", result.accessToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          maxAge: 15 * 60 * 1000,
+        });
+
+        res.cookie("refresh_token", result.refreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
+        res.status(200).json({
+          user: {
+            id: result.id,
+            email: result.email,
+            role: result.role,
+          },
+        });
+      } catch (error) {
+        const err = error instanceof Error ? error : new Error("Unknown error");
+        if (err.message === "Invalid credentials") {
+          return res.status(401).json({ error: "Invalid credentials" });
+        }
+
+        captureError(err, {
+          tags: {
+            feature: "auth",
+            operation: "login",
+          },
+          extra: {
+            email,
+          },
+        });
+
+        return res.status(500).json({
+          error:
+            process.env.NODE_ENV === "production"
+              ? "Internal server error"
+              : err.message,
+        });
+      }
     },
     me: async (req: Request, res: Response) => {
       if (!req.user) {
@@ -112,16 +156,42 @@ export const authController = (prisma: PrismaClient) => {
         return res.status(401).json({ error: "Refresh token not found" });
       }
 
-      const result = await refreshAccessToken(prisma, refreshToken);
+      try {
+        const result = await refreshAccessToken(prisma, refreshToken);
 
-      res.cookie("access_token", result.accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 15 * 60 * 1000,
-      });
+        res.cookie("access_token", result.accessToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          maxAge: 15 * 60 * 1000,
+        });
 
-      res.status(200).json({ accessToken: result.accessToken });
+        res.status(200).json({ accessToken: result.accessToken });
+      } catch (error) {
+        const err = error instanceof Error ? error : new Error("Unknown error");
+        if (
+          err.message === "Invalid or expired refresh token" ||
+          err.message === "Refresh token is required"
+        ) {
+          return res
+            .status(401)
+            .json({ error: "Invalid or expired refresh token" });
+        }
+
+        captureError(err, {
+          tags: {
+            feature: "auth",
+            operation: "refresh-token",
+          },
+        });
+
+        return res.status(500).json({
+          error:
+            process.env.NODE_ENV === "production"
+              ? "Internal server error"
+              : err.message,
+        });
+      }
     },
   };
 };

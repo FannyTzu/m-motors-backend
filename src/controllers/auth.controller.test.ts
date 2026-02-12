@@ -24,7 +24,7 @@ it("return 201 and user if registration succeeds", async () => {
   });
   expect(response.body.accessToken).toBe("token");
 });
-it("return 500 if service throws an error", async () => {
+it("return 409 if email is already used", async () => {
   (authService.registerUser as jest.Mock).mockRejectedValue(
     new Error("Cet email est déjà utilisé."),
   );
@@ -33,7 +33,7 @@ it("return 500 if service throws an error", async () => {
     .post("/auth/register")
     .send({ email: "test@mail.com", password: "password123" });
 
-  expect(res.status).toBe(500);
+  expect(res.status).toBe(409);
   expect(res.body.error).toBe("Cet email est déjà utilisé.");
 });
 
