@@ -13,20 +13,20 @@ export const createAuthRoutes = (prisma: PrismaClient) => {
   router.post(
     "/register",
     validateSchema(registerSchema),
-    catchAsync(controller.register),
+    controller.register,
   );
 
   router.post(
     "/login",
     validateSchema(loginSchema),
-    catchAsync(controller.login),
+    controller.login,
   );
 
   router.get("/me", authMiddleware, catchAsync(controller.me));
 
   router.post("/logout", authMiddleware, catchAsync(controller.logout));
 
-  router.post("/refresh-token", catchAsync(controller.refreshToken));
+  router.post("/refresh-token", controller.refreshToken);
 
   return router;
 };
