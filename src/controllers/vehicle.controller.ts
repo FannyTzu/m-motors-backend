@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import { vehicleService } from "../services/vehicle.service";
-import { captureError } from "../utils/sentry";
+import { addBreadcrumb } from "../utils/sentry";
 
 export const vehicleController = (prisma: PrismaClient) => {
   return {
@@ -100,18 +100,6 @@ export const vehicleController = (prisma: PrismaClient) => {
       const { id } = req.params;
       const vehicle = await vehicleService(prisma).getVehicleById(Number(id));
       if (!vehicle) {
-        captureError(new Error(`Vehicle not found`), {
-          tags: {
-            feature: "vehicles",
-            operation: "getById",
-            status: "404",
-          },
-          extra: {
-            vehicleId: id,
-            userId: req.user?.sub,
-          },
-          level: "warning",
-        });
         return res.status(404).json({ error: "Vehicle not found" });
       }
       res.status(200).json(vehicle);
@@ -129,20 +117,10 @@ export const vehicleController = (prisma: PrismaClient) => {
     },
     deleteVehicleById: async (req: Request, res: Response) => {
       const { id } = req.params;
-      await vehicleService(prisma).deleteVehicleById(Number(id));
-
-      captureError(new Error(`Vehicle ${id} deleted`), {
-        tags: {
-          feature: "vehicles",
-          operation: "delete",
-          action: "success",
-        },
-        extra: {
-          vehicleId: id,
-        },
-        level: "info",
+      addBreadcrumb(`Vehicle ${id} deleted`, "vehicle", {
+        vehicleId: id,
       });
-
+      await vehicleService(prisma).deleteVehicleById(Number(id));
       res.status(204).send();
     },
   };
