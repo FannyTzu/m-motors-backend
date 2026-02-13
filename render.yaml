@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: m-motors-backend
+    env: node
+    buildCommand: npm install && npx prisma migrate deploy && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
