@@ -25,14 +25,14 @@ export const authController = (prisma: PrismaClient) => {
         res.cookie("access_token", result.accessToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
           maxAge: 15 * 60 * 1000,
         });
 
         res.cookie("refresh_token", result.refreshToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
           maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
@@ -81,14 +81,14 @@ export const authController = (prisma: PrismaClient) => {
         res.cookie("access_token", result.accessToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
           maxAge: 15 * 60 * 1000,
         });
 
         res.cookie("refresh_token", result.refreshToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
           maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
@@ -143,10 +143,12 @@ export const authController = (prisma: PrismaClient) => {
       res.clearCookie("access_token", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       });
       res.clearCookie("refresh_token", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       });
       res.status(200).json({ message: "Logged out successfully" });
     },
@@ -162,7 +164,7 @@ export const authController = (prisma: PrismaClient) => {
         res.cookie("access_token", result.accessToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
           maxAge: 15 * 60 * 1000,
         });
 
