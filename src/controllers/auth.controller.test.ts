@@ -1,6 +1,6 @@
 import request from "supertest";
-import { app } from "../app";
-import * as authService from "../services/auth.service";
+import { app } from "../app.js";
+import * as authService from "../services/auth.service.js";
 import jwt from "jsonwebtoken";
 
 jest.mock("../../src/services/auth.service");

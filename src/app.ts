@@ -3,9 +3,9 @@ import cors from "cors";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
-import { createAuthRoutes } from "./routes/auth.routes";
-import { createVehicleRoutes } from "./routes/vehicle.routes";
-import { createHealthRoutes } from "./routes/health.routes";
+import { createAuthRoutes } from "./routes/auth.routes.js";
+import { createVehicleRoutes } from "./routes/vehicle.routes.js";
+import { createHealthRoutes } from "./routes/health.routes.js";
 import cookieParser from "cookie-parser";
 import * as Sentry from "@sentry/node";
 

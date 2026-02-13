@@ -4,8 +4,8 @@ import {
   registerUser,
   loginUser,
   refreshAccessToken,
-} from "../services/auth.service";
-import { addBreadcrumb, captureError } from "../utils/sentry";
+} from "../services/auth.service.js";
+import { addBreadcrumb, captureError } from "../utils/sentry.js";
 
 export const authController = (prisma: PrismaClient) => {
   return {

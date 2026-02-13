@@ -1,13 +1,16 @@
 import { Router } from "express";
 import { PrismaClient, Role } from "@prisma/client";
-import { vehicleController } from "../controllers/vehicle.controller";
-import { authMiddleware, roleMiddleware } from "../middlewares/auth.middleware";
-import { validateSchema } from "../middlewares/validateSchema";
+import { vehicleController } from "../controllers/vehicle.controller.js";
+import {
+  authMiddleware,
+  roleMiddleware,
+} from "../middlewares/auth.middleware.js";
+import { validateSchema } from "../middlewares/validateSchema.js";
 import {
   createVehicleSchema,
   updateVehicleSchema,
-} from "../schemas/vehicle.schema";
-import { catchAsync } from "../utils/sentry";
+} from "../schemas/vehicle.schema.js";
+import { catchAsync } from "../utils/sentry.js";
 
 export const createVehicleRoutes = (prisma: PrismaClient) => {
   const router = Router();

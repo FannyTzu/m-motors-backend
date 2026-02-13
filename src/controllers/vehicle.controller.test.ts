@@ -1,6 +1,6 @@
 import request from "supertest";
-import { app } from "../app";
-import * as vehicleService from "../services/vehicle.service";
+import { app } from "../app.js";
+import * as vehicleService from "../services/vehicle.service.js";
 import {
   VehiclesStatus,
   VehiclesTransmision,
