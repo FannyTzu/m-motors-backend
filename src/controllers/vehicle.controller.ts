@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-import { vehicleService } from "../services/vehicle.service";
-import { addBreadcrumb } from "../utils/sentry";
+import { vehicleService } from "../services/vehicle.service.js";
+import { addBreadcrumb } from "../utils/sentry.js";
 
 export const vehicleController = (prisma: PrismaClient) => {
   return {
