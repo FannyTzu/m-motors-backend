@@ -135,9 +135,25 @@ export const authController = (prisma: PrismaClient) => {
           id: true,
           mail: true,
           role: true,
+          first_name: true,
+          last_name: true,
+          phone_number: true,
+          address: true,
         },
       });
-      res.status(200).json({ user });
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      res.status(200).json({
+        id: user.id,
+        mail: user.mail,
+        role: user.role,
+        firstName: user.first_name ?? undefined,
+        lastName: user.last_name ?? undefined,
+        phone: user.phone_number ?? undefined,
+        address: user.address ?? undefined,
+      });
     },
     logout: (req: Request, res: Response) => {
       res.clearCookie("access_token", {
