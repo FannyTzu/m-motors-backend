@@ -155,6 +155,65 @@ export const authController = (prisma: PrismaClient) => {
         address: user.address ?? undefined,
       });
     },
+    updateMe: async (req: Request, res: Response) => {
+      if (!req.user) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      const userId = req.user.sub;
+      const { firstName, lastName, phone, address } = req.body;
+
+      try {
+        const updateData: any = {};
+        if (firstName !== undefined) updateData.first_name = firstName;
+        if (lastName !== undefined) updateData.last_name = lastName;
+        if (phone !== undefined) updateData.phone_number = phone;
+        if (address !== undefined) updateData.address = address;
+
+        const updatedUser = await prisma.user.update({
+          where: { id: userId },
+          data: updateData,
+          select: {
+            id: true,
+            mail: true,
+            role: true,
+            first_name: true,
+            last_name: true,
+            phone_number: true,
+            address: true,
+          },
+        });
+        res.status(200).json({
+          id: updatedUser.id,
+          mail: updatedUser.mail,
+          role: updatedUser.role,
+          firstName: updatedUser.first_name ?? undefined,
+          lastName: updatedUser.last_name ?? undefined,
+          phone: updatedUser.phone_number ?? undefined,
+          address: updatedUser.address ?? undefined,
+        });
+      } catch (error) {
+        const err = error instanceof Error ? error : new Error("Unknown error");
+        captureError(err, {
+          tags: {
+            feature: "auth",
+            operation: "update-me",
+          },
+          extra: {
+            userId,
+            firstName,
+            lastName,
+            phone,
+            address,
+          },
+        });
+        return res.status(500).json({
+          error:
+            process.env.NODE_ENV === "production"
+              ? "Internal server error"
+              : err.message,
+        });
+      }
+    },
     logout: (req: Request, res: Response) => {
       res.clearCookie("access_token", {
         httpOnly: true,
