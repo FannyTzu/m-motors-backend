@@ -107,3 +107,9 @@ it("return 200 and an accessToken if refresh_token is valid", async () => {
   expect(res.status).toBe(200);
   expect(res.body.accessToken).toBe("newAccessToken");
 });
+
+it("return 401 if user is not authenticated", async () => {
+  const res = await request(app).patch("/auth/me");
+
+  expect(res.status).toBe(401);
+});
