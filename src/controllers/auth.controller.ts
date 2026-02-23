@@ -4,6 +4,7 @@ import {
   registerUser,
   loginUser,
   refreshAccessToken,
+  deleteUserAccount,
 } from "../services/auth.service.js";
 import { addBreadcrumb, captureError } from "../utils/sentry.js";
 
@@ -262,6 +263,46 @@ export const authController = (prisma: PrismaClient) => {
           },
         });
 
+        return res.status(500).json({
+          error:
+            process.env.NODE_ENV === "production"
+              ? "Internal server error"
+              : err.message,
+        });
+      }
+    },
+    deleteAccount: async (req: Request, res: Response) => {
+      if (!req.user) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      const userId = req.user.sub;
+      if (typeof userId !== "number") {
+        return res.status(400).json({ error: "User ID is missing or invalid" });
+      }
+      try {
+        await deleteUserAccount(prisma, userId);
+        res.clearCookie("access_token", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        });
+        res.clearCookie("refresh_token", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        });
+        res.status(200).json({ message: "Account deleted successfully" });
+      } catch (error) {
+        const err = error instanceof Error ? error : new Error("Unknown error");
+        captureError(err, {
+          tags: {
+            feature: "auth",
+            operation: "delete-account",
+          },
+          extra: {
+            userId,
+          },
+        });
         return res.status(500).json({
           error:
             process.env.NODE_ENV === "production"

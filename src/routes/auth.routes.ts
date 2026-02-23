@@ -31,5 +31,7 @@ export const createAuthRoutes = (prisma: PrismaClient) => {
 
   router.post("/refresh-token", controller.refreshToken);
 
+  router.delete("/me", authMiddleware, catchAsync(controller.deleteAccount));
+
   return router;
 };
