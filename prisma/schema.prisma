@@ -15,7 +15,11 @@ enum Role {
 
 enum FolderStatus {
   active
+  submitted
+  accepted
+  rejected
   closed
+  cancelled
   archived
 }
 
@@ -79,12 +83,15 @@ model RefreshToken {
 }
 
 model Folder {
-  id         Int          @id @default(autoincrement())
-  user_id    Int
-  user       User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  status     FolderStatus @default(active)
-  created_at DateTime     @default(now())
-  orders     Order[]
+  id          Int          @id @default(autoincrement())
+  user_id     Int
+  user        User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  vehicle_id Int
+  vehicle     Vehicle      @relation(fields: [vehicle_id], references: [id])
+  status      FolderStatus @default(active)
+  created_at  DateTime     @default(now())
+  orders      Order[]
+  documents   Document[]
 }
 
 model Vehicle {
@@ -105,14 +112,15 @@ model Vehicle {
   status     VehiclesStatus @default(available)
   created_at DateTime      @default(now())
   orders     Order[]
+  folders    Folder[]
 }
 
 model Order {
   id           Int           @id @default(autoincrement())
   folder_id    Int
   folder       Folder        @relation(fields: [folder_id], references: [id], onDelete: Cascade)
-  vehicles_id  Int
-  vehicle      Vehicle       @relation(fields: [vehicles_id], references: [id], onDelete: Restrict)
+  vehicle_id  Int
+  vehicle      Vehicle       @relation(fields: [vehicle_id], references: [id], onDelete: Restrict)
   total_amount Decimal       @db.Decimal(12, 2)
   status       OrderStatus   @default(draft)
   created_at   DateTime      @default(now())
@@ -146,4 +154,14 @@ model Payment {
   status         PaymentStatus @default(pending)
   transaction_id String?
   paid_at        DateTime?
+}
+
+model Document {
+  id        Int      @id @default(autoincrement())
+  folder_id Int
+  folder    Folder   @relation(fields: [folder_id], references: [id], onDelete: Cascade)
+  name      String
+  url       String   
+  type      String?  
+  created_at DateTime @default(now())
 }

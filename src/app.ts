@@ -8,6 +8,7 @@ import { createVehicleRoutes } from "./routes/vehicle.routes.js";
 import { createHealthRoutes } from "./routes/health.routes.js";
 import cookieParser from "cookie-parser";
 import * as Sentry from "@sentry/node";
+import { createFolderRoutes } from "./routes/folder.routes.js";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -42,6 +43,7 @@ app.get("/debug-sentry", (req, res) => {
 
 app.use("/auth", createAuthRoutes(prisma));
 app.use("/vehicle", createVehicleRoutes(prisma));
+app.use("/folder", createFolderRoutes(prisma));
 
 Sentry.setupExpressErrorHandler(app);
 
