@@ -121,3 +121,11 @@ export const refreshAccessToken = async (
 
   return { accessToken };
 };
+
+export const deleteUserAccount = async (
+  prisma: PrismaClient,
+  userId: number,
+) => {
+  await prisma.refreshToken.deleteMany({ where: { user_id: userId } });
+  await prisma.user.delete({ where: { id: userId } });
+};
