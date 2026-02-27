@@ -2,6 +2,24 @@ import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import { vehicleService } from "../services/vehicle.service.js";
 import { addBreadcrumb } from "../utils/sentry.js";
+import multer from "multer";
+
+const storage = multer.memoryStorage();
+export const uploadVehicleImage = multer({
+  storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedMimes = ["image/jpeg", "image/jpg", "image/png"];
+
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Invalid file type. Only images (JPEG, PNG) are allowed."));
+    }
+  },
+});
 
 export const vehicleController = (prisma: PrismaClient) => {
   return {
@@ -115,6 +133,49 @@ export const vehicleController = (prisma: PrismaClient) => {
       );
       res.status(200).json(vehicles);
     },
+
+    uploadImage: async (req: Request, res: Response) => {
+      try {
+        const vehicleId = req.params.id ? Number(req.params.id) : undefined;
+
+        if (!req.file) {
+          return res.status(400).json({ error: "No image uploaded" });
+        }
+
+        if (vehicleId) {
+          const existingVehicle =
+            await vehicleService(prisma).getVehicleById(vehicleId);
+          if (existingVehicle?.image) {
+            await vehicleService(prisma).deleteVehicleImage(
+              existingVehicle.image,
+            );
+          }
+        }
+
+        const result = await vehicleService(prisma).uploadVehicleImage(
+          req.file,
+          vehicleId,
+        );
+
+        if (vehicleId) {
+          await vehicleService(prisma).updateVehicle(vehicleId, {
+            image: result.publicUrl,
+          } as any);
+        }
+
+        res.status(201).json({
+          message: "Image uploaded successfully",
+          ...result,
+        });
+      } catch (error) {
+        console.error("Error uploading vehicle image:", error);
+        res.status(500).json({
+          error: "Failed to upload image",
+          message: error instanceof Error ? error.message : "Unknown error",
+        });
+      }
+    },
+
     deleteVehicleById: async (req: Request, res: Response) => {
       const { id } = req.params;
       addBreadcrumb(`Vehicle ${id} deleted`, "vehicle", {
