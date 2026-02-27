@@ -16,7 +16,9 @@ export const upload = multer({
       cb(null, true);
     } else {
       cb(
-        new Error("Invalid file type. Only images and documents are allowed."),
+        new Error(
+          "Invalid file type. Only images and documents (PDF) are allowed.",
+        ),
       );
     }
   },
