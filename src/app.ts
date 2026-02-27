@@ -9,6 +9,7 @@ import { createHealthRoutes } from "./routes/health.routes.js";
 import cookieParser from "cookie-parser";
 import * as Sentry from "@sentry/node";
 import { createFolderRoutes } from "./routes/folder.routes.js";
+import { documentRoutes } from "./routes/document.routes.js";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -41,9 +42,11 @@ app.get("/debug-sentry", (req, res) => {
   throw new Error("Test Sentry - Erreur volontaire pour tester le monitoring");
 });
 
+// all routes features
 app.use("/auth", createAuthRoutes(prisma));
 app.use("/vehicle", createVehicleRoutes(prisma));
 app.use("/folder", createFolderRoutes(prisma));
+app.use("/documents", documentRoutes(prisma));
 
 Sentry.setupExpressErrorHandler(app);
 
