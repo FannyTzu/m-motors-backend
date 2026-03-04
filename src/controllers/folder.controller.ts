@@ -4,6 +4,15 @@ import { Request, Response } from "express";
 
 export const folderController = (prisma: PrismaClient) => {
   return {
+    getAllFolders: async (req: Request, res: Response) => {
+      try {
+        const folders = await folderService(prisma).getAllFolders();
+        res.json(folders);
+      } catch (error) {
+        console.error("Error fetching all folders:", error);
+        res.status(500).json({ error: "Failed to fetch all folders" });
+      }
+    },
     createFolder: async (req: Request, res: Response) => {
       const { userId, vehicleId } = req.body;
       if (!userId || !vehicleId) {

@@ -19,10 +19,52 @@ export const folderService = (prisma: PrismaClient) => {
       });
       return folder;
     },
+    getAllFolders: async () => {
+      return prisma.folder.findMany({
+        include: {
+          orders: true,
+          user: {
+            select: {
+              id: true,
+              first_name: true,
+              last_name: true,
+              mail: true,
+              phone_number: true,
+              address: true,
+              city: true,
+              zip_code: true,
+              country: true,
+              role: true,
+            },
+          },
+          vehicle: true,
+        },
+        orderBy: {
+          created_at: "desc",
+        },
+      });
+    },
     getFoldersByUser: async (userId: number) => {
       return prisma.folder.findMany({
         where: { user_id: userId },
-        include: { orders: true },
+        include: {
+          orders: true,
+          user: {
+            select: {
+              id: true,
+              first_name: true,
+              last_name: true,
+              mail: true,
+              phone_number: true,
+              address: true,
+              city: true,
+              zip_code: true,
+              country: true,
+              role: true,
+            },
+          },
+          vehicle: true,
+        },
       });
     },
     updateFolderStatus: async (id: number, status: FolderStatus) => {
