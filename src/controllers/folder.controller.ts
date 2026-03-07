@@ -34,6 +34,14 @@ export const folderController = (prisma: PrismaClient) => {
       );
       res.json(folders);
     },
+    getFolderById: async (req: Request, res: Response) => {
+      const { id } = req.params;
+      const folder = await folderService(prisma).getFolderById(Number(id));
+      if (!folder) {
+        return res.status(404).json({ error: "Folder not found" });
+      }
+      res.json(folder);
+    },
     updateFolderStatus: async (req: Request, res: Response) => {
       const { id } = req.params;
       const { status } = req.body;

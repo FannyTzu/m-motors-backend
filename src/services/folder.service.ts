@@ -67,6 +67,24 @@ export const folderService = (prisma: PrismaClient) => {
         },
       });
     },
+    getFolderById: async (id: number) => {
+      return prisma.folder.findUnique({
+        where: { id },
+        include: {
+          orders: true,
+          user: {
+            select: {
+              id: true,
+              first_name: true,
+              last_name: true,
+              mail: true,
+              phone_number: true,
+            },
+          },
+          vehicle: true,
+        },
+      });
+    },
     updateFolderStatus: async (id: number, status: FolderStatus) => {
       return prisma.folder.update({
         where: { id },
