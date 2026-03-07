@@ -6,6 +6,8 @@ export const createFolderRoutes = (prisma: PrismaClient) => {
   const router = Router();
   const controller = folderController(prisma);
 
+  router.get("/", controller.getAllFolders);
+
   router.post("/create", controller.createFolder);
 
   router.get("/user/:userId", controller.getFoldersByUser);
