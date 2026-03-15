@@ -8,6 +8,15 @@ export interface UploadDocumentInput {
   type?: string;
 }
 
+//Supabase storage which doesn't accept non-ASCII characters in keys, we need to convert
+const convertFilename = (filename: string): string => {
+  return filename
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9._-]/g, "_")
+    .replace(/_{2,}/g, "_");
+};
+
 export const documentService = (prisma: PrismaClient) => {
   return {
     uploadDocument: async (input: UploadDocumentInput) => {
@@ -21,7 +30,8 @@ export const documentService = (prisma: PrismaClient) => {
         throw new Error("Folder not found");
       }
 
-      const fileName = `folder_${folderId}/${Date.now()}_${file.originalname}`;
+      const sanitizedName = convertFilename(file.originalname);
+      const fileName = `folder_${folderId}/${Date.now()}_${sanitizedName}`;
 
       const { data, error } = await supabase.storage
         .from(BUCKET_DOCUMENTS)

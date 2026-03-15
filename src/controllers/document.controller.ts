@@ -10,7 +10,14 @@ export const upload = multer({
     fileSize: 10 * 1024 * 1024,
   },
   fileFilter: (req, file, cb) => {
-    const allowedMimes = ["image/jpeg", "image/png", "application/pdf"];
+    const allowedMimes = [
+      "image/jpeg",
+      "image/png",
+      "application/pdf",
+      "application/x-pdf",
+      "text/pdf",
+      "application/x-bzpdf",
+    ];
 
     if (allowedMimes.includes(file.mimetype)) {
       cb(null, true);
