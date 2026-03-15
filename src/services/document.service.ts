@@ -30,8 +30,8 @@ export const documentService = (prisma: PrismaClient) => {
         throw new Error("Folder not found");
       }
 
-      const sanitizedName = convertFilename(file.originalname);
-      const fileName = `folder_${folderId}/${Date.now()}_${sanitizedName}`;
+      const convertedName = convertFilename(file.originalname);
+      const fileName = `folder_${folderId}/${Date.now()}_${convertedName}`;
 
       const { data, error } = await supabase.storage
         .from(BUCKET_DOCUMENTS)
