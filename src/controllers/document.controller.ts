@@ -13,6 +13,7 @@ export const upload = multer({
     const allowedMimes = [
       "image/jpeg",
       "image/png",
+      "image/jpg",
       "application/pdf",
       "application/x-pdf",
       "text/pdf",
