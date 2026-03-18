@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { folderService } from "../services/folder.service";
+import { folderService } from "../services/folder.service.js";
 import { Request, Response } from "express";
 
 export const folderController = (prisma: PrismaClient) => {

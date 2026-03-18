@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { documentService, UploadDocumentInput } from "./document.service";
-import * as supabaseUtils from "../utils/supabase";
+import * as supabaseUtils from "../utils/supabase.js";
 
 jest.mock("@prisma/client");
 

@@ -4,7 +4,7 @@ import {
   VehiclesTransmision,
   VehiclesType,
 } from "@prisma/client";
-import { supabase, BUCKET_VEHICLES } from "../utils/supabase";
+import { supabase, BUCKET_VEHICLES } from "../utils/supabase.js";
 
 export interface VehicleData {
   brand: string;
