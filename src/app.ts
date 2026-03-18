@@ -17,12 +17,48 @@ const prisma = new PrismaClient({ adapter });
 
 export const app = express();
 
+// FRONTEND_URL accept one or many origins separaed by ","
+const envOrigins = (process.env.FRONTEND_URL ?? "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const allowedOrigins = new Set([
+  ...envOrigins,
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://127.0.0.1:3000",
+  "http://127.0.0.1:3001",
+]);
+
+// dev : accept all - prod : only allowedOrigins
+const corsOrigin = (
+  origin: string | undefined,
+  callback: (err: Error | null, allow?: boolean) => void,
+) => {
+  if (!origin) {
+    return callback(null, true);
+  }
+
+  const isLocalDevOrigin =
+    process.env.NODE_ENV !== "production" &&
+    /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+
+  if (isLocalDevOrigin || allowedOrigins.has(origin)) {
+    return callback(null, true);
+  }
+
+  callback(new Error(`Not allowed by CORS: ${origin}`));
+};
+
+// CORS config
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3001",
+    origin: corsOrigin,
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    optionsSuccessStatus: 200,
   }),
 );
 app.use(express.json());
