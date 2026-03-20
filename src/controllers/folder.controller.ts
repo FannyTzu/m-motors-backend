@@ -54,5 +54,10 @@ export const folderController = (prisma: PrismaClient) => {
       );
       res.json(updatedFolder);
     },
+    deleteFolder: async (req: Request, res: Response) => {
+      const { id } = req.params;
+      await folderService(prisma).deleteFolder(Number(id));
+      res.status(204).send();
+    },
   };
 };
