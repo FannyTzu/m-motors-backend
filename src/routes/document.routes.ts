@@ -1,7 +1,10 @@
 import { Router } from "express";
 import { PrismaClient } from "@prisma/client";
-import { documentController, upload } from "../controllers/document.controller";
-import { authMiddleware } from "../middlewares/auth.middleware";
+import {
+  documentController,
+  upload,
+} from "../controllers/document.controller.js";
+import { authMiddleware } from "../middlewares/auth.middleware.js";
 
 export const documentRoutes = (prisma: PrismaClient): Router => {
   const router = Router();

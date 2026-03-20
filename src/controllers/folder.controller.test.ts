@@ -1,5 +1,5 @@
 import { folderController } from "./folder.controller";
-import { folderService } from "../services/folder.service";
+import { folderService } from "../services/folder.service.js";
 import { FolderStatus } from "@prisma/client";
 import { Request, Response } from "express";
 

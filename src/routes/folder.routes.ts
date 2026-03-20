@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
-import { folderController } from "../controllers/folder.controller";
+import { folderController } from "../controllers/folder.controller.js";
 
 export const createFolderRoutes = (prisma: PrismaClient) => {
   const router = Router();
