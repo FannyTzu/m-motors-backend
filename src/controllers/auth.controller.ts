@@ -281,7 +281,9 @@ export const authController = (prisma: PrismaClient) => {
         return res.status(400).json({ error: "User ID is missing or invalid" });
       }
       if (userRole === "admin") {
-        return res.status(403).json({ error: "Admin accounts cannot be deleted." });
+        return res
+          .status(403)
+          .json({ error: "Admin accounts cannot be deleted." });
       }
       try {
         await deleteUserAccount(prisma, userId);
