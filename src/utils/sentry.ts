@@ -41,7 +41,6 @@ export const catchAsync = (fn: Function) => {
           method: req.method,
         },
         extra: {
-          body: req.body,
           params: req.params,
           query: req.query,
         },

@@ -281,15 +281,25 @@ describe("folderController", () => {
         status: FolderStatus.closed,
         created_at: new Date(),
         updated_at: new Date(),
+        user: {
+          id: 1,
+          first_name: "John",
+          last_name: "Doe",
+          mail: "john@example.com",
+        },
+        vehicle: { id: 1, brand: "Toyota" },
+        documents: [],
       };
 
       mockReq = {
         params: { id: "1" },
         body: { status: FolderStatus.closed },
+        user: { sub: 1, role: "user" },
       };
 
+      const mockUpdateFolderStatus = jest.fn().mockResolvedValue(updatedFolder);
       (folderService as jest.Mock).mockReturnValue({
-        updateFolderStatus: jest.fn().mockResolvedValue(updatedFolder),
+        updateFolderStatus: mockUpdateFolderStatus,
       });
 
       await controller.updateFolderStatus(
@@ -297,13 +307,35 @@ describe("folderController", () => {
         mockRes as Response,
       );
 
+      expect(mockUpdateFolderStatus).toHaveBeenCalledWith(
+        1,
+        FolderStatus.closed,
+        1,
+        "user",
+      );
       expect(mockRes.json).toHaveBeenCalledWith(updatedFolder);
+    });
+
+    it("should return 401 if user is not authenticated", async () => {
+      mockReq = {
+        params: { id: "1" },
+        body: { status: FolderStatus.closed },
+      };
+
+      await controller.updateFolderStatus(
+        mockReq as Request,
+        mockRes as Response,
+      );
+
+      expect(mockRes.status).toHaveBeenCalledWith(401);
+      expect(mockRes.json).toHaveBeenCalledWith({ error: "Unauthorized" });
     });
 
     it("should return 400 if status is missing", async () => {
       mockReq = {
         params: { id: "1" },
         body: {},
+        user: { sub: 1, role: "user" },
       };
 
       await controller.updateFolderStatus(
@@ -321,6 +353,7 @@ describe("folderController", () => {
       mockReq = {
         params: { id: "2" },
         body: { status: FolderStatus.active },
+        user: { sub: 1, role: "user" },
       };
 
       const mockUpdateFolderStatus = jest.fn().mockResolvedValue({});
@@ -336,7 +369,61 @@ describe("folderController", () => {
       expect(mockUpdateFolderStatus).toHaveBeenCalledWith(
         2,
         FolderStatus.active,
+        1,
+        "user",
       );
+    });
+
+    it("should return 403 if user is not authorized to update folder", async () => {
+      mockReq = {
+        params: { id: "1" },
+        body: { status: FolderStatus.closed },
+        user: { sub: 2, role: "user" },
+      };
+
+      const mockUpdateFolderStatus = jest
+        .fn()
+        .mockRejectedValue(
+          new Error("Forbidden: You can only update your own folders"),
+        );
+      (folderService as jest.Mock).mockReturnValue({
+        updateFolderStatus: mockUpdateFolderStatus,
+      });
+
+      await controller.updateFolderStatus(
+        mockReq as Request,
+        mockRes as Response,
+      );
+
+      expect(mockRes.status).toHaveBeenCalledWith(403);
+      expect(mockRes.json).toHaveBeenCalledWith({
+        error: "Forbidden: You can only update your own folders",
+      });
+    });
+
+    it("should return 404 if folder not found", async () => {
+      mockReq = {
+        params: { id: "999" },
+        body: { status: FolderStatus.closed },
+        user: { sub: 1, role: "user" },
+      };
+
+      const mockUpdateFolderStatus = jest
+        .fn()
+        .mockRejectedValue(new Error("Folder not found"));
+      (folderService as jest.Mock).mockReturnValue({
+        updateFolderStatus: mockUpdateFolderStatus,
+      });
+
+      await controller.updateFolderStatus(
+        mockReq as Request,
+        mockRes as Response,
+      );
+
+      expect(mockRes.status).toHaveBeenCalledWith(404);
+      expect(mockRes.json).toHaveBeenCalledWith({
+        error: "Folder not found",
+      });
     });
   });
 });

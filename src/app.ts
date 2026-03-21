@@ -72,12 +72,6 @@ app.get("/", (req, res) => {
 // Health & Monitoring Routes
 app.use("/", createHealthRoutes(prisma));
 
-// Test Sentry - (todo delete this route in production)
-app.get("/debug-sentry", (req, res) => {
-  console.log("🧪 Test Sentry avec throw...");
-  throw new Error("Test Sentry - Erreur volontaire pour tester le monitoring");
-});
-
 // all routes features
 app.use("/auth", createAuthRoutes(prisma));
 app.use("/vehicle", createVehicleRoutes(prisma));
