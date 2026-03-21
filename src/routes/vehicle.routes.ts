@@ -1,6 +1,9 @@
 import { Router } from "express";
 import { PrismaClient, Role } from "@prisma/client";
-import { vehicleController } from "../controllers/vehicle.controller.js";
+import {
+  vehicleController,
+  uploadVehicleImage,
+} from "../controllers/vehicle.controller.js";
 import {
   authMiddleware,
   roleMiddleware,
@@ -26,9 +29,9 @@ export const createVehicleRoutes = (prisma: PrismaClient) => {
 
   router.get("/", catchAsync(controller.getAllVehicles));
 
-  router.get("/:id", catchAsync(controller.getVehicleById));
-
   router.get("/type/:type", catchAsync(controller.getVehiclesByType));
+
+  router.get("/:id", catchAsync(controller.getVehicleById));
 
   router.put(
     "/:id",
@@ -36,6 +39,14 @@ export const createVehicleRoutes = (prisma: PrismaClient) => {
     authMiddleware,
     roleMiddleware(Role.admin),
     catchAsync(controller.updateVehicle),
+  );
+
+  router.post(
+    "/:id/image",
+    authMiddleware,
+    roleMiddleware(Role.admin),
+    uploadVehicleImage.single("image"),
+    catchAsync(controller.uploadImage),
   );
 
   router.delete(

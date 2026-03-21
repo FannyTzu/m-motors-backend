@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   db:
@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: devpassword
       POSTGRES_DB: mydatabase_m_motors
     ports:
-      - "5433:5432"
+      - "15432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
 

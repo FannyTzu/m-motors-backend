@@ -1,22 +1,10 @@
 import * as Sentry from "@sentry/node";
 
-if (process.env.NODE_ENV !== "test") {
+if (process.env.NODE_ENV === "production") {
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
-    environment: process.env.NODE_ENV || "development",
-    enabled: true,
+    environment: "production",
     tracesSampleRate: 1.0,
-    sendDefaultPii: true,
-    debug: false,
-
-    beforeSend(event) {
-      if (process.env.NODE_ENV !== "production") {
-        console.log(
-          "Sentry:",
-          event.exception?.values?.[0]?.value || event.message,
-        );
-      }
-      return event;
-    },
+    sendDefaultPii: false,
   });
 }

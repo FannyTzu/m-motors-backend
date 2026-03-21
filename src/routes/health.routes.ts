@@ -15,7 +15,7 @@ export const createHealthRoutes = (prisma: PrismaClient) => {
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
         environment: process.env.NODE_ENV,
-        version: "1.0.0",
+        version: "2.0.0",
       });
     } catch (error) {
       Sentry.captureException(error, {

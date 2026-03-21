@@ -3,7 +3,11 @@ import { PrismaClient } from "@prisma/client";
 import { authController } from "../controllers/auth.controller.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { validateSchema } from "../middlewares/validateSchema.js";
-import { loginSchema, registerSchema } from "../schemas/auth.schema.js";
+import {
+  loginSchema,
+  registerSchema,
+  updateMeSchema,
+} from "../schemas/auth.schema.js";
 import { catchAsync } from "../utils/sentry.js";
 
 export const createAuthRoutes = (prisma: PrismaClient) => {
@@ -16,9 +20,18 @@ export const createAuthRoutes = (prisma: PrismaClient) => {
 
   router.get("/me", authMiddleware, catchAsync(controller.me));
 
+  router.patch(
+    "/me",
+    authMiddleware,
+    validateSchema(updateMeSchema),
+    catchAsync(controller.updateMe),
+  );
+
   router.post("/logout", authMiddleware, catchAsync(controller.logout));
 
   router.post("/refresh-token", controller.refreshToken);
+
+  router.delete("/me", authMiddleware, catchAsync(controller.deleteAccount));
 
   return router;
 };

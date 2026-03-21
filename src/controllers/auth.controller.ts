@@ -4,6 +4,7 @@ import {
   registerUser,
   loginUser,
   refreshAccessToken,
+  deleteUserAccount,
 } from "../services/auth.service.js";
 import { addBreadcrumb, captureError } from "../utils/sentry.js";
 
@@ -135,9 +136,84 @@ export const authController = (prisma: PrismaClient) => {
           id: true,
           mail: true,
           role: true,
+          first_name: true,
+          last_name: true,
+          phone_number: true,
+          address: true,
         },
       });
-      res.status(200).json({ user });
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      res.status(200).json({
+        id: user.id,
+        mail: user.mail,
+        role: user.role,
+        firstName: user.first_name ?? undefined,
+        lastName: user.last_name ?? undefined,
+        phone: user.phone_number ?? undefined,
+        address: user.address ?? undefined,
+      });
+    },
+    updateMe: async (req: Request, res: Response) => {
+      if (!req.user) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      const userId = req.user.sub;
+      const { firstName, lastName, phone, address } = req.body;
+
+      try {
+        const updateData: any = {};
+        if (firstName !== undefined) updateData.first_name = firstName;
+        if (lastName !== undefined) updateData.last_name = lastName;
+        if (phone !== undefined) updateData.phone_number = phone;
+        if (address !== undefined) updateData.address = address;
+
+        const updatedUser = await prisma.user.update({
+          where: { id: userId },
+          data: updateData,
+          select: {
+            id: true,
+            mail: true,
+            role: true,
+            first_name: true,
+            last_name: true,
+            phone_number: true,
+            address: true,
+          },
+        });
+        res.status(200).json({
+          id: updatedUser.id,
+          mail: updatedUser.mail,
+          role: updatedUser.role,
+          firstName: updatedUser.first_name ?? undefined,
+          lastName: updatedUser.last_name ?? undefined,
+          phone: updatedUser.phone_number ?? undefined,
+          address: updatedUser.address ?? undefined,
+        });
+      } catch (error) {
+        const err = error instanceof Error ? error : new Error("Unknown error");
+        captureError(err, {
+          tags: {
+            feature: "auth",
+            operation: "update-me",
+          },
+          extra: {
+            userId,
+            firstName,
+            lastName,
+            phone,
+            address,
+          },
+        });
+        return res.status(500).json({
+          error:
+            process.env.NODE_ENV === "production"
+              ? "Internal server error"
+              : err.message,
+        });
+      }
     },
     logout: (req: Request, res: Response) => {
       res.clearCookie("access_token", {
@@ -187,6 +263,52 @@ export const authController = (prisma: PrismaClient) => {
           },
         });
 
+        return res.status(500).json({
+          error:
+            process.env.NODE_ENV === "production"
+              ? "Internal server error"
+              : err.message,
+        });
+      }
+    },
+    deleteAccount: async (req: Request, res: Response) => {
+      if (!req.user) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      const userId = req.user.sub;
+      const userRole = req.user.role;
+      if (typeof userId !== "number") {
+        return res.status(400).json({ error: "User ID is missing or invalid" });
+      }
+      if (userRole === "admin") {
+        return res
+          .status(403)
+          .json({ error: "Admin accounts cannot be deleted." });
+      }
+      try {
+        await deleteUserAccount(prisma, userId);
+        res.clearCookie("access_token", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        });
+        res.clearCookie("refresh_token", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        });
+        res.status(200).json({ message: "Account deleted successfully" });
+      } catch (error) {
+        const err = error instanceof Error ? error : new Error("Unknown error");
+        captureError(err, {
+          tags: {
+            feature: "auth",
+            operation: "delete-account",
+          },
+          extra: {
+            userId,
+          },
+        });
         return res.status(500).json({
           error:
             process.env.NODE_ENV === "production"
