@@ -22,7 +22,7 @@ export const createFolderRoutes = (prisma: PrismaClient) => {
 
   router.put("/:id/status", controller.updateFolderStatus);
 
-  router.delete("/:id", roleMiddleware(Role.admin), controller.deleteFolder);
+  router.delete("/:id", controller.deleteFolder);
 
   return router;
 };

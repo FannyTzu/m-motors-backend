@@ -97,6 +97,7 @@ export const refreshAccessToken = async (
   }
 
   const refreshTokenRecords = await prisma.refreshToken.findMany({
+    where: { expires_at: { gt: new Date() } },
     include: { user: true },
   });
 

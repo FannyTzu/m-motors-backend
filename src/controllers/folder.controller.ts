@@ -89,8 +89,31 @@ export const folderController = (prisma: PrismaClient) => {
     },
     deleteFolder: async (req: Request, res: Response) => {
       const { id } = req.params;
-      await folderService(prisma).deleteFolder(Number(id));
-      res.status(204).send();
+      const userId = req.user?.sub;
+      const userRole = req.user?.role;
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      try {
+        await folderService(prisma).deleteFolder(Number(id), userId, userRole);
+        res.status(204).send();
+      } catch (error) {
+        const err = error instanceof Error ? error : new Error("Unknown error");
+        if (err.message.includes("not found")) {
+          return res.status(404).json({ error: err.message });
+        }
+        if (
+          err.message.includes("not authorized") ||
+          err.message.includes("Forbidden")
+        ) {
+          return res.status(403).json({ error: err.message });
+        }
+        console.error("Error deleting folder:", err);
+        return res.status(500).json({
+          error: "Failed to delete folder",
+          message: err.message,
+        });
+      }
     },
   };
 };

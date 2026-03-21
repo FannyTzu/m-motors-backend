@@ -15,8 +15,7 @@ export const authMiddleware = (req: any, res: any, next: any) => {
     req.user = decoded;
 
     Sentry.setUser({
-      id: decoded.userId,
-      email: decoded.email,
+      id: String(decoded.sub),
       role: decoded.role,
     });
 

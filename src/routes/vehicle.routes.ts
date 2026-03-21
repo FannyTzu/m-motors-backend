@@ -29,9 +29,9 @@ export const createVehicleRoutes = (prisma: PrismaClient) => {
 
   router.get("/", catchAsync(controller.getAllVehicles));
 
-  router.get("/:id", catchAsync(controller.getVehicleById));
-
   router.get("/type/:type", catchAsync(controller.getVehiclesByType));
+
+  router.get("/:id", catchAsync(controller.getVehicleById));
 
   router.put(
     "/:id",

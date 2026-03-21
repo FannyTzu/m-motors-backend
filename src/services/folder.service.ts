@@ -155,22 +155,28 @@ export const folderService = (prisma: PrismaClient) => {
         },
       });
     },
-    deleteFolder: async (id: number) => {
+    deleteFolder: async (id: number, userId: number, userRole?: string) => {
+      const folder = await prisma.folder.findUnique({ where: { id } });
+      if (!folder) {
+        throw new Error("Folder not found");
+      }
+      const isOwner = folder.user_id === userId;
+      const isAdmin = userRole === "admin";
+      if (!isOwner && !isAdmin) {
+        throw new Error("Forbidden: You can only delete your own folders");
+      }
       const documents = await prisma.document.findMany({
         where: { folder_id: id },
       });
-
       if (documents.length > 0) {
         const filePaths = documents.map((doc) => doc.url);
         const { error } = await supabase.storage
           .from(BUCKET_DOCUMENTS)
           .remove(filePaths);
-
         if (error) {
           console.error("Failed to delete files from Supabase:", error);
         }
       }
-
       return prisma.folder.delete({
         where: { id },
       });
