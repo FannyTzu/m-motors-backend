@@ -251,46 +251,143 @@ describe("folderService", () => {
   });
 
   describe("updateFolderStatus", () => {
-    it("should update folder status", async () => {
-      const updatedFolder = {
-        id: 1,
-        user_id: 1,
-        vehicle_id: 1,
-        status: FolderStatus.closed,
-        created_at: new Date(),
-        updated_at: new Date(),
-      };
-
-      prismaMock.folder.update.mockResolvedValue(updatedFolder);
-
-      const result = await service.updateFolderStatus(1, FolderStatus.closed);
-
-      expect(prismaMock.folder.update).toHaveBeenCalledWith({
-        where: { id: 1 },
-        data: { status: FolderStatus.closed },
-      });
-      expect(result).toEqual(updatedFolder);
-    });
-
-    it("should update folder status to active", async () => {
-      const updatedFolder = {
+    it("should update folder status for folder owner", async () => {
+      const folder = {
         id: 1,
         user_id: 1,
         vehicle_id: 1,
         status: FolderStatus.active,
-        created_at: new Date(),
-        updated_at: new Date(),
+        documents: [{ id: 1, folder_id: 1, name: "Document 1" }],
       };
 
+      const updatedFolder = {
+        ...folder,
+        status: FolderStatus.submitted,
+        user: {
+          id: 1,
+          first_name: "John",
+          last_name: "Doe",
+          mail: "john@example.com",
+        },
+        vehicle: { id: 1, brand: "Toyota" },
+      };
+
+      prismaMock.folder.findUnique.mockResolvedValue(folder);
       prismaMock.folder.update.mockResolvedValue(updatedFolder);
 
-      const result = await service.updateFolderStatus(1, FolderStatus.active);
+      const result = await service.updateFolderStatus(
+        1,
+        FolderStatus.submitted,
+        1,
+        "user",
+      );
 
+      expect(prismaMock.folder.findUnique).toHaveBeenCalledWith({
+        where: { id: 1 },
+        include: { documents: true },
+      });
       expect(prismaMock.folder.update).toHaveBeenCalledWith({
         where: { id: 1 },
-        data: { status: FolderStatus.active },
+        data: { status: FolderStatus.submitted },
+        include: {
+          user: {
+            select: {
+              id: true,
+              first_name: true,
+              last_name: true,
+              mail: true,
+            },
+          },
+          vehicle: true,
+          documents: true,
+        },
       });
       expect(result).toEqual(updatedFolder);
+    });
+
+    it("should allow admin to update any folder status", async () => {
+      const folder = {
+        id: 1,
+        user_id: 5,
+        vehicle_id: 1,
+        status: FolderStatus.active,
+        documents: [{ id: 1, folder_id: 1, name: "Document 1" }],
+      };
+
+      const updatedFolder = {
+        ...folder,
+        status: FolderStatus.submitted,
+      };
+
+      prismaMock.folder.findUnique.mockResolvedValue(folder);
+      prismaMock.folder.update.mockResolvedValue(updatedFolder);
+
+      const result = await service.updateFolderStatus(
+        1,
+        FolderStatus.submitted,
+        2, // Different user but admin
+        "admin",
+      );
+
+      expect(result).toEqual(updatedFolder);
+    });
+
+    it("should throw error if user is not owner and not admin", async () => {
+      const folder = {
+        id: 1,
+        user_id: 5,
+        vehicle_id: 1,
+        status: FolderStatus.active,
+        documents: [{ id: 1, folder_id: 1, name: "Document 1" }],
+      };
+
+      prismaMock.folder.findUnique.mockResolvedValue(folder);
+
+      await expect(
+        service.updateFolderStatus(1, FolderStatus.submitted, 2, "user"),
+      ).rejects.toThrow("Forbidden: You can only update your own folders");
+    });
+
+    it("should throw error if folder not found", async () => {
+      prismaMock.folder.findUnique.mockResolvedValue(null);
+
+      await expect(
+        service.updateFolderStatus(999, FolderStatus.submitted, 1, "user"),
+      ).rejects.toThrow("Folder not found");
+    });
+
+    it("should throw error for invalid status transition", async () => {
+      const folder = {
+        id: 1,
+        user_id: 1,
+        vehicle_id: 1,
+        status: FolderStatus.archived,
+        documents: [],
+      };
+
+      prismaMock.folder.findUnique.mockResolvedValue(folder);
+
+      await expect(
+        service.updateFolderStatus(1, FolderStatus.active, 1, "user"),
+      ).rejects.toThrow("Invalid status transition from archived to active");
+    });
+
+    it("should throw error if trying to submit without documents", async () => {
+      const folder = {
+        id: 1,
+        user_id: 1,
+        vehicle_id: 1,
+        status: FolderStatus.active,
+        documents: [], // No documents
+      };
+
+      prismaMock.folder.findUnique.mockResolvedValue(folder);
+
+      await expect(
+        service.updateFolderStatus(1, FolderStatus.submitted, 1, "user"),
+      ).rejects.toThrow(
+        "Cannot submit folder without documents. At least one document is required.",
+      );
     });
   });
 });

@@ -86,10 +86,73 @@ export const folderService = (prisma: PrismaClient) => {
         },
       });
     },
-    updateFolderStatus: async (id: number, status: FolderStatus) => {
+    updateFolderStatus: async (
+      id: number,
+      newStatus: FolderStatus,
+      userId: number,
+      userRole?: string,
+    ) => {
+      const folder = await prisma.folder.findUnique({
+        where: { id },
+        include: { documents: true },
+      });
+
+      if (!folder) {
+        throw new Error("Folder not found");
+      }
+
+      //user can update their own folder, or admin can update any
+      const isUser = folder.user_id === userId;
+      const isAdmin = userRole === "admin";
+
+      if (!isUser && !isAdmin) {
+        throw new Error("Forbidden: You can only update your own folders");
+      }
+
+      //status transitions
+      const validTransitions: Record<FolderStatus, FolderStatus[]> = {
+        [FolderStatus.active]: [FolderStatus.submitted],
+        [FolderStatus.submitted]: [
+          FolderStatus.active,
+          FolderStatus.accepted,
+          FolderStatus.rejected,
+        ],
+        [FolderStatus.accepted]: [FolderStatus.closed, FolderStatus.archived],
+        [FolderStatus.rejected]: [FolderStatus.active],
+        [FolderStatus.closed]: [FolderStatus.archived],
+        [FolderStatus.cancelled]: [FolderStatus.active],
+        [FolderStatus.archived]: [],
+      };
+
+      if (!validTransitions[folder.status]?.includes(newStatus)) {
+        throw new Error(
+          `Invalid status transition from ${folder.status} to ${newStatus}`,
+        );
+      }
+
+      if (newStatus === FolderStatus.submitted) {
+        if (folder.documents.length === 0) {
+          throw new Error(
+            "Cannot submit folder without documents. At least one document is required.",
+          );
+        }
+      }
+
       return prisma.folder.update({
         where: { id },
-        data: { status },
+        data: { status: newStatus },
+        include: {
+          user: {
+            select: {
+              id: true,
+              first_name: true,
+              last_name: true,
+              mail: true,
+            },
+          },
+          vehicle: true,
+          documents: true,
+        },
       });
     },
     deleteFolder: async (id: number) => {
