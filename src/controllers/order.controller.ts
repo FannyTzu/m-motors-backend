@@ -1,0 +1,124 @@
+import { PrismaClient } from "@prisma/client";
+import { Request, Response } from "express";
+import { orderService } from "../services/order.service.js";
+import { addBreadcrumb } from "../utils/sentry.js";
+
+export const orderController = (prisma: PrismaClient) => {
+  return {
+    createOrder: async (req: Request, res: Response) => {
+      const { folder_id, vehicle_id, options } = req.body;
+      const userId = req.user?.sub;
+
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      try {
+        const folder = await prisma.folder.findUnique({
+          where: { id: folder_id },
+        });
+
+        if (!folder || folder.user_id !== userId) {
+          return res
+            .status(403)
+            .json({ error: "Folder not found or access denied" });
+        }
+
+        if (folder.vehicle_id !== vehicle_id) {
+          return res.status(400).json({
+            error: "Vehicle ID does not match the folder's vehicle",
+          });
+        }
+
+        const order = await orderService(prisma).createOrder({
+          folder_id,
+          vehicle_id,
+          options: options || [],
+          user_id: userId,
+        });
+
+        addBreadcrumb("Order created", "order", {
+          orderId: order.id,
+          folderId: folder_id,
+          vehicleId: vehicle_id,
+        });
+
+        res.status(201).json(order);
+      } catch (error: any) {
+        addBreadcrumb("Order creation error", "order", {
+          error: error.message,
+        });
+
+        if (error.message === "Vehicle not found") {
+          return res.status(404).json({ error: "Vehicle not found" });
+        }
+
+        if (error.message === "One or more options not found") {
+          return res
+            .status(404)
+            .json({ error: "One or more options not found" });
+        }
+
+        res.status(500).json({ error: "Internal server error" });
+      }
+    },
+
+    getOrder: async (req: Request, res: Response) => {
+      const { id } = req.params;
+      const userId = req.user?.sub;
+
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      try {
+        const order = await orderService(prisma).getOrderById(Number(id));
+
+        const folder = await prisma.folder.findUnique({
+          where: { id: order.folder_id },
+        });
+
+        if (!folder || folder.user_id !== userId) {
+          return res.status(403).json({ error: "Access denied" });
+        }
+
+        res.status(200).json(order);
+      } catch (error: any) {
+        if (error.message === "Order not found") {
+          return res.status(404).json({ error: "Order not found" });
+        }
+
+        res.status(500).json({ error: "Internal server error" });
+      }
+    },
+
+    getOrdersByFolder: async (req: Request, res: Response) => {
+      const { folder_id } = req.params;
+      const userId = req.user?.sub;
+
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      try {
+        const folder = await prisma.folder.findUnique({
+          where: { id: Number(folder_id) },
+        });
+
+        if (!folder || folder.user_id !== userId) {
+          return res
+            .status(403)
+            .json({ error: "Folder not found or access denied" });
+        }
+
+        const orders = await orderService(prisma).getOrdersByFolderId(
+          Number(folder_id),
+        );
+
+        res.status(200).json(orders);
+      } catch (error) {
+        res.status(500).json({ error: "Internal server error" });
+      }
+    },
+  };
+};
