@@ -603,4 +603,210 @@ describe("orderController", () => {
       });
     });
   });
+
+  describe("updateOrderStatus", () => {
+    it("should update order status successfully", async () => {
+      const mockOrder = {
+        id: 1,
+        folder_id: 10,
+        vehicle_id: 1,
+        total_amount: new Decimal("25000"),
+        status: "draft",
+        options: [],
+        vehicle: { id: 1, price: new Decimal("25000") },
+      };
+
+      const updatedOrder = {
+        ...mockOrder,
+        status: "confirmed",
+      };
+
+      const mockFolder = {
+        id: 10,
+        user_id: 1,
+        vehicle_id: 1,
+      };
+
+      mockReq = {
+        params: { id: "1" },
+        body: { status: "confirmed" },
+        user: { sub: 1 },
+      };
+
+      (orderService as jest.Mock).mockReturnValue({
+        getOrderById: jest.fn().mockResolvedValue(mockOrder),
+        updateOrderStatus: jest.fn().mockResolvedValue(updatedOrder),
+      });
+      (prismaMock.folder.findUnique as jest.Mock).mockResolvedValue(mockFolder);
+
+      await controller.updateOrderStatus(
+        mockReq as Request,
+        mockRes as Response,
+      );
+
+      expect(mockRes.status).toHaveBeenCalledWith(200);
+      expect(mockRes.json).toHaveBeenCalledWith(updatedOrder);
+      expect(addBreadcrumb).toHaveBeenCalledWith(
+        "Order status updated",
+        "order",
+        expect.objectContaining({
+          orderId: 1,
+          status: "confirmed",
+        }),
+      );
+    });
+
+    it("should update order status to cancelled", async () => {
+      const mockOrder = {
+        id: 1,
+        folder_id: 10,
+        vehicle_id: 1,
+        total_amount: new Decimal("25000"),
+        status: "confirmed",
+        options: [],
+      };
+
+      const updatedOrder = {
+        ...mockOrder,
+        status: "cancelled",
+      };
+
+      const mockFolder = {
+        id: 10,
+        user_id: 1,
+        vehicle_id: 1,
+      };
+
+      mockReq = {
+        params: { id: "1" },
+        body: { status: "cancelled" },
+        user: { sub: 1 },
+      };
+
+      (orderService as jest.Mock).mockReturnValue({
+        getOrderById: jest.fn().mockResolvedValue(mockOrder),
+        updateOrderStatus: jest.fn().mockResolvedValue(updatedOrder),
+      });
+      (prismaMock.folder.findUnique as jest.Mock).mockResolvedValue(mockFolder);
+
+      await controller.updateOrderStatus(
+        mockReq as Request,
+        mockRes as Response,
+      );
+
+      expect(mockRes.status).toHaveBeenCalledWith(200);
+      expect(mockRes.json).toHaveBeenCalledWith(updatedOrder);
+    });
+
+    it("should return 401 if user is not authenticated", async () => {
+      mockReq = {
+        params: { id: "1" },
+        body: { status: "confirmed" },
+        user: undefined,
+      };
+
+      await controller.updateOrderStatus(
+        mockReq as Request,
+        mockRes as Response,
+      );
+
+      expect(mockRes.status).toHaveBeenCalledWith(401);
+      expect(mockRes.json).toHaveBeenCalledWith({ error: "Unauthorized" });
+    });
+
+    it("should return 404 if order not found", async () => {
+      mockReq = {
+        params: { id: "999" },
+        body: { status: "confirmed" },
+        user: { sub: 1 },
+      };
+
+      (orderService as jest.Mock).mockReturnValue({
+        getOrderById: jest.fn().mockRejectedValue(new Error("Order not found")),
+      });
+
+      await controller.updateOrderStatus(
+        mockReq as Request,
+        mockRes as Response,
+      );
+
+      expect(mockRes.status).toHaveBeenCalledWith(404);
+      expect(mockRes.json).toHaveBeenCalledWith({ error: "Order not found" });
+    });
+
+    it("should return 403 if order belongs to another user", async () => {
+      const mockOrder = {
+        id: 1,
+        folder_id: 10,
+        vehicle_id: 1,
+        total_amount: new Decimal("25000"),
+        status: "draft",
+      };
+
+      const mockFolder = {
+        id: 10,
+        user_id: 2, // Different user
+        vehicle_id: 1,
+      };
+
+      mockReq = {
+        params: { id: "1" },
+        body: { status: "confirmed" },
+        user: { sub: 1 },
+      };
+
+      (orderService as jest.Mock).mockReturnValue({
+        getOrderById: jest.fn().mockResolvedValue(mockOrder),
+      });
+      (prismaMock.folder.findUnique as jest.Mock).mockResolvedValue(mockFolder);
+
+      await controller.updateOrderStatus(
+        mockReq as Request,
+        mockRes as Response,
+      );
+
+      expect(mockRes.status).toHaveBeenCalledWith(403);
+      expect(mockRes.json).toHaveBeenCalledWith({ error: "Access denied" });
+    });
+
+    it("should return 500 on internal server error", async () => {
+      const mockOrder = {
+        id: 1,
+        folder_id: 10,
+        vehicle_id: 1,
+        total_amount: new Decimal("25000"),
+        status: "draft",
+      };
+
+      const mockFolder = {
+        id: 10,
+        user_id: 1,
+        vehicle_id: 1,
+      };
+
+      mockReq = {
+        params: { id: "1" },
+        body: { status: "confirmed" },
+        user: { sub: 1 },
+      };
+
+      (orderService as jest.Mock).mockReturnValue({
+        getOrderById: jest.fn().mockResolvedValue(mockOrder),
+        updateOrderStatus: jest
+          .fn()
+          .mockRejectedValue(new Error("Database error")),
+      });
+      (prismaMock.folder.findUnique as jest.Mock).mockResolvedValue(mockFolder);
+
+      await controller.updateOrderStatus(
+        mockReq as Request,
+        mockRes as Response,
+      );
+
+      expect(mockRes.status).toHaveBeenCalledWith(500);
+      expect(mockRes.json).toHaveBeenCalledWith({
+        error: "Internal server error",
+      });
+    });
+  });
 });
