@@ -38,6 +38,7 @@
     "cors": "^2.8.6",
     "cross-spawn": "^7.0.6",
     "csstype": "^3.2.3",
+    "decimal.js": "^10.6.0",
     "deepmerge-ts": "^7.1.5",
     "defu": "^6.1.4",
     "denque": "^2.1.0",
