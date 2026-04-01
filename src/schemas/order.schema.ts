@@ -17,3 +17,14 @@ export const createOrderSchema = z.object({
 });
 
 export type CreateOrderInput = z.infer<typeof createOrderSchema>;
+
+export const updateOrderStatusSchema = z.object({
+  status: z
+    .enum(["draft", "confirmed", "cancelled"])
+    .refine(
+      (val) => ["draft", "confirmed", "cancelled"].includes(val),
+      { message: "Status must be one of: draft, confirmed, cancelled" }
+    ),
+});
+
+export type UpdateOrderStatusInput = z.infer<typeof updateOrderStatusSchema>;

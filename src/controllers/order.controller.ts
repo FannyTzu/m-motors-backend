@@ -120,5 +120,49 @@ export const orderController = (prisma: PrismaClient) => {
         res.status(500).json({ error: "Internal server error" });
       }
     },
+
+    updateOrderStatus: async (req: Request, res: Response) => {
+      const { id } = req.params;
+      const { status } = req.body;
+      const userId = req.user?.sub;
+
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      try {
+        const order = await orderService(prisma).getOrderById(Number(id));
+
+        const folder = await prisma.folder.findUnique({
+          where: { id: order.folder_id },
+        });
+
+        if (!folder || folder.user_id !== userId) {
+          return res.status(403).json({ error: "Access denied" });
+        }
+
+        const updatedOrder = await orderService(prisma).updateOrderStatus(
+          Number(id),
+          status,
+        );
+
+        addBreadcrumb("Order status updated", "order", {
+          orderId: updatedOrder.id,
+          status,
+        });
+
+        res.status(200).json(updatedOrder);
+      } catch (error: any) {
+        addBreadcrumb("Order status update error", "order", {
+          error: error.message,
+        });
+
+        if (error.message === "Order not found") {
+          return res.status(404).json({ error: "Order not found" });
+        }
+
+        res.status(500).json({ error: "Internal server error" });
+      }
+    },
   };
 };
