@@ -113,7 +113,8 @@
     "start": "node --import ./dist/instrument.js dist/index.js",
     "build": "npx prisma generate && tsc",
     "postinstall": "prisma generate",
-    "create-admin": "tsx prisma/seedAdmin.ts"
+    "create-admin": "tsx prisma/seedAdmin.ts",
+    "seed-options": "tsx prisma/seedOptions.ts"
   },
   "keywords": [],
   "author": "",
