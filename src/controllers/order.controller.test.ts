@@ -77,60 +77,11 @@ describe("orderController", () => {
       );
     });
 
-    it("should create an order with options", async () => {
-      const mockFolder = {
-        id: 10,
-        user_id: 1,
-        vehicle_id: 1,
-      };
-
-      const mockOrder = {
-        id: 1,
-        folder_id: 10,
-        vehicle_id: 1,
-        total_amount: new Decimal("26500"),
-        status: "draft",
-        options: [
-          {
-            option_id: 1,
-            price_at_order: "500",
-            option: { id: 1, price: new Decimal("500") },
-          },
-          {
-            option_id: 2,
-            price_at_order: "1000",
-            option: { id: 2, price: new Decimal("1000") },
-          },
-        ],
-        vehicle: { id: 1, price: new Decimal("25000") },
-      };
-
-      mockReq = {
-        body: {
-          folder_id: 10,
-          vehicle_id: 1,
-          options: [{ option_id: 1 }, { option_id: 2 }],
-        },
-        user: { sub: 1 },
-      };
-
-      (prismaMock.folder.findUnique as jest.Mock).mockResolvedValue(mockFolder);
-      (orderService as jest.Mock).mockReturnValue({
-        createOrder: jest.fn().mockResolvedValue(mockOrder),
-      });
-
-      await controller.createOrder(mockReq as Request, mockRes as Response);
-
-      expect(mockRes.status).toHaveBeenCalledWith(201);
-      expect(mockRes.json).toHaveBeenCalledWith(mockOrder);
-    });
-
     it("should return 401 if user is not authenticated", async () => {
       mockReq = {
         body: {
           folder_id: 10,
           vehicle_id: 1,
-          options: [],
         },
         user: undefined,
       };
@@ -146,7 +97,6 @@ describe("orderController", () => {
         body: {
           folder_id: 999,
           vehicle_id: 1,
-          options: [],
         },
         user: { sub: 1 },
       };
@@ -198,7 +148,6 @@ describe("orderController", () => {
         body: {
           folder_id: 10,
           vehicle_id: 2, // Different vehicle
-          options: [],
         },
         user: { sub: 1 },
       };
@@ -224,7 +173,6 @@ describe("orderController", () => {
         body: {
           folder_id: 10,
           vehicle_id: 1,
-          options: [],
         },
         user: { sub: 1 },
       };
@@ -242,37 +190,6 @@ describe("orderController", () => {
       expect(mockRes.json).toHaveBeenCalledWith({ error: "Vehicle not found" });
     });
 
-    it("should return 404 if options not found", async () => {
-      const mockFolder = {
-        id: 10,
-        user_id: 1,
-        vehicle_id: 1,
-      };
-
-      mockReq = {
-        body: {
-          folder_id: 10,
-          vehicle_id: 1,
-          options: [{ option_id: 999 }],
-        },
-        user: { sub: 1 },
-      };
-
-      (prismaMock.folder.findUnique as jest.Mock).mockResolvedValue(mockFolder);
-      (orderService as jest.Mock).mockReturnValue({
-        createOrder: jest
-          .fn()
-          .mockRejectedValue(new Error("One or more options not found")),
-      });
-
-      await controller.createOrder(mockReq as Request, mockRes as Response);
-
-      expect(mockRes.status).toHaveBeenCalledWith(404);
-      expect(mockRes.json).toHaveBeenCalledWith({
-        error: "One or more options not found",
-      });
-    });
-
     it("should return 500 on internal server error", async () => {
       const mockFolder = {
         id: 10,
@@ -284,7 +201,6 @@ describe("orderController", () => {
         body: {
           folder_id: 10,
           vehicle_id: 1,
-          options: [],
         },
         user: { sub: 1 },
       };
