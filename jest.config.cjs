@@ -19,7 +19,7 @@ module.exports = {
     ],
   },
   coverageDirectory: "coverage",
-  collectCoverageFrom: ["src/**/*.ts", "!src/index.ts", "!src/**/*.d.ts"],
+  collectCoverageFrom: ["src/**/*.ts", "!src/index.ts", "!src/instrument.ts", "!src/**/*.d.ts"],
   testMatch: ["**/__tests__/**/*.ts", "**/*.test.ts", "**/*.spec.ts"],
   moduleFileExtensions: ["ts", "js", "json"],
   verbose: true,
