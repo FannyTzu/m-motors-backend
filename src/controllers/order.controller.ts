@@ -6,7 +6,7 @@ import { addBreadcrumb } from "../utils/sentry.js";
 export const orderController = (prisma: PrismaClient) => {
   return {
     createOrder: async (req: Request, res: Response) => {
-      const { folder_id, vehicle_id, options } = req.body;
+      const { folder_id, vehicle_id } = req.body;
       const userId = req.user?.sub;
 
       if (!userId) {
@@ -33,7 +33,6 @@ export const orderController = (prisma: PrismaClient) => {
         const order = await orderService(prisma).createOrder({
           folder_id,
           vehicle_id,
-          options: options || [],
           user_id: userId,
         });
 
@@ -51,12 +50,6 @@ export const orderController = (prisma: PrismaClient) => {
 
         if (error.message === "Vehicle not found") {
           return res.status(404).json({ error: "Vehicle not found" });
-        }
-
-        if (error.message === "One or more options not found") {
-          return res
-            .status(404)
-            .json({ error: "One or more options not found" });
         }
 
         res.status(500).json({ error: "Internal server error" });
