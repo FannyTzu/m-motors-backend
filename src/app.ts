@@ -12,6 +12,7 @@ import { createFolderRoutes } from "./routes/folder.routes.js";
 import { documentRoutes } from "./routes/document.routes.js";
 import { createOrderRoutes } from "./routes/order.routes.js";
 import { createOptionRoutes } from "./routes/option.routes.js";
+import { createPaymentRoutes } from "./routes/payment.routes.js";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -81,6 +82,7 @@ app.use("/folder", createFolderRoutes(prisma));
 app.use("/documents", documentRoutes(prisma));
 app.use("/orders", createOrderRoutes(prisma));
 app.use("/options", createOptionRoutes(prisma));
+app.use("/payments", createPaymentRoutes(prisma));
 
 Sentry.setupExpressErrorHandler(app);
 
