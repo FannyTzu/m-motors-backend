@@ -9,6 +9,14 @@ const prismaMock = {
     findUnique: jest.fn(),
     update: jest.fn(),
   },
+  vehicle: {
+    findUnique: jest.fn(),
+    update: jest.fn(),
+  },
+  $transaction: jest.fn((cb) => cb(prismaMock)),
+  document: {
+    findMany: jest.fn(),
+  },
 } as any;
 
 describe("folderService", () => {
@@ -38,13 +46,16 @@ describe("folderService", () => {
 
     it("should create a new folder if none exists", async () => {
       prismaMock.folder.findFirst.mockResolvedValue(null);
+      prismaMock.vehicle.findUnique.mockResolvedValue({
+        id: 1,
+        status: "available",
+      });
       const newFolder = {
         id: 1,
         user_id: 1,
         vehicle_id: 1,
         status: FolderStatus.active,
         created_at: new Date(),
-        updated_at: new Date(),
       };
       prismaMock.folder.create.mockResolvedValue(newFolder);
 
@@ -52,6 +63,9 @@ describe("folderService", () => {
 
       expect(prismaMock.folder.findFirst).toHaveBeenCalledWith({
         where: { vehicle_id: 1 },
+      });
+      expect(prismaMock.vehicle.findUnique).toHaveBeenCalledWith({
+        where: { id: 1 },
       });
       expect(prismaMock.folder.create).toHaveBeenCalledWith({
         data: {
