@@ -1,14 +1,14 @@
 import request from "supertest";
-import { app } from "../app.js";
-import * as vehicleService from "../services/vehicle.service.js";
+import { app } from "../../app.js";
+import * as vehicleService from "../../services/vehicle/vehicle.service.js";
 import {
   VehiclesStatus,
   VehiclesTransmision,
   VehiclesType,
 } from "@prisma/client";
 
-jest.mock("../services/vehicle.service");
-jest.mock("../middlewares/auth.middleware", () => ({
+jest.mock("../../services/vehicle/vehicle.service.js");
+jest.mock("../../middlewares/auth.middleware", () => ({
   authMiddleware: (req: any, res: any, next: any) => next(),
   roleMiddleware: () => (req: any, res: any, next: any) => next(),
 }));

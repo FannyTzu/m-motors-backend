@@ -1,5 +1,5 @@
 import { PrismaClient, FolderStatus, VehiclesStatus } from "@prisma/client";
-import { supabase, BUCKET_DOCUMENTS } from "../utils/supabase.js";
+import { supabase, BUCKET_DOCUMENTS } from "../../utils/supabase.js";
 
 export const folderService = (prisma: PrismaClient) => {
   return {

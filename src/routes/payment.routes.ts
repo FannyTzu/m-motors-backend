@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { PrismaClient } from "@prisma/client";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
-import { paymentController } from "../controllers/payment.controller.js";
+import { paymentController } from "../controllers/payment/payment.controller.js";
 import { catchAsync } from "../utils/sentry.js";
 
 export const createPaymentRoutes = (prisma: PrismaClient) => {

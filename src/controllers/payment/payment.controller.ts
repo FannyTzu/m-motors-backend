@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { PrismaClient, PaymentStatus } from "@prisma/client";
-import { paymentService } from "../services/payment.service.js";
-import { addBreadcrumb } from "../utils/sentry.js";
+import { paymentService } from "../../services/payment/payment.service.js";
+import { addBreadcrumb } from "../../utils/sentry.js";
 
 export const paymentController = (prisma: PrismaClient) => {
   const service = paymentService(prisma);

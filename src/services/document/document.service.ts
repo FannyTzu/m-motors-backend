@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { supabase, BUCKET_DOCUMENTS } from "../utils/supabase.js";
+import { supabase, BUCKET_DOCUMENTS } from "../../utils/supabase.js";
 
 export interface UploadDocumentInput {
   folderId: number;

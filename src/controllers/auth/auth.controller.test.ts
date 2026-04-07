@@ -1,8 +1,8 @@
 import request from "supertest";
-import * as authService from "../services/auth.service.js";
+import * as authService from "../../services/auth/auth.service.js";
 import jwt from "jsonwebtoken";
 
-jest.mock("../../src/services/auth.service");
+jest.mock("../../services/auth/auth.service.js");
 
 jest.mock("jsonwebtoken");
 
@@ -29,7 +29,7 @@ jest.mock("pg", () => ({
   Pool: jest.fn(),
 }));
 
-import { app } from "../app.js";
+import { app } from "../../app.js";
 
 it("return 201 and user if registration succeeds", async () => {
   (authService.registerUser as jest.Mock).mockResolvedValue({

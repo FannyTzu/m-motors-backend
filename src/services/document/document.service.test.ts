@@ -1,10 +1,10 @@
 import { PrismaClient } from "@prisma/client";
 import { documentService, UploadDocumentInput } from "./document.service";
-import * as supabaseUtils from "../utils/supabase.js";
+import * as supabaseUtils from "../../utils/supabase.js";
 
 jest.mock("@prisma/client");
 
-jest.mock("../utils/supabase", () => ({
+jest.mock("../../utils/supabase", () => ({
   supabase: {
     storage: {
       from: jest.fn(),

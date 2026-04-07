@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import {
   documentController,
   upload,
-} from "../controllers/document.controller.js";
+} from "../controllers/document/document.controller.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 
 export const documentRoutes = (prisma: PrismaClient): Router => {

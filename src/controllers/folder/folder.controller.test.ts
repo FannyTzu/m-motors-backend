@@ -1,9 +1,9 @@
 import { folderController } from "./folder.controller";
-import { folderService } from "../services/folder.service.js";
+import { folderService } from "../../services/folder/folder.service.js";
 import { FolderStatus } from "@prisma/client";
 import { Request, Response } from "express";
 
-jest.mock("../services/folder.service");
+jest.mock("../../services/folder/folder.service.js");
 
 const prismaMock = {
   folder: {
