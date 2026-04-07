@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-import { orderService } from "../services/order.service.js";
-import { addBreadcrumb } from "../utils/sentry.js";
+import { orderService } from "../../services/order/order.service.js";
+import { addBreadcrumb } from "../../utils/sentry.js";
 
 export const orderController = (prisma: PrismaClient) => {
   return {

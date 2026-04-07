@@ -3,7 +3,7 @@ import { PrismaClient, Role } from "@prisma/client";
 import {
   vehicleController,
   uploadVehicleImage,
-} from "../controllers/vehicle.controller.js";
+} from "../controllers/vehicle/vehicle.controller.js";
 import {
   authMiddleware,
   roleMiddleware,

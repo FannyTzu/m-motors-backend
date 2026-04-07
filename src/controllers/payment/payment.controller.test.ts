@@ -1,9 +1,9 @@
 import { paymentController } from "./payment.controller";
-import { paymentService } from "../services/payment.service";
+import { paymentService } from "../../services/payment/payment.service";
 import { PaymentStatus } from "@prisma/client";
 
-jest.mock("../services/payment.service");
-jest.mock("../utils/sentry", () => ({
+jest.mock("../../services/payment/payment.service");
+jest.mock("../../utils/sentry", () => ({
   addBreadcrumb: jest.fn(),
 }));
 

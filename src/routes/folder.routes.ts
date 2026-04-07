@@ -1,6 +1,6 @@
 import { PrismaClient, Role } from "@prisma/client";
 import { Router } from "express";
-import { folderController } from "../controllers/folder.controller.js";
+import { folderController } from "../controllers/folder/folder.controller.js";
 import {
   authMiddleware,
   roleMiddleware,

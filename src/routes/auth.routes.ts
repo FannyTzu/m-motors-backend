@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { PrismaClient } from "@prisma/client";
-import { authController } from "../controllers/auth.controller.js";
+import { authController } from "../controllers/auth/auth.controller.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { validateSchema } from "../middlewares/validateSchema.js";
 import {

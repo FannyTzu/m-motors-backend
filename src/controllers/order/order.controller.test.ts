@@ -1,11 +1,11 @@
 import { orderController } from "./order.controller";
-import { orderService } from "../services/order.service.js";
-import { addBreadcrumb } from "../utils/sentry.js";
+import { orderService } from "../../services/order/order.service.js";
+import { addBreadcrumb } from "../../utils/sentry.js";
 import { Request, Response } from "express";
 import Decimal from "decimal.js";
 
-jest.mock("../services/order.service");
-jest.mock("../utils/sentry.js");
+jest.mock("../../services/order/order.service.js");
+jest.mock("../../utils/sentry.js");
 
 const prismaMock = {
   folder: {

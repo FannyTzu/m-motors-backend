@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { documentService } from "../services/document.service.js";
+import { documentService } from "../../services/document/document.service.js";
 import { Request, Response } from "express";
 import multer from "multer";
 
