@@ -6,6 +6,185 @@ import {
   roleMiddleware,
 } from "../middlewares/auth.middleware.js";
 
+/**
+ * @openapi
+ * tags:
+ *   - name: Folders
+ *     description: Gestion des dossiers client
+ */
+
+/**
+ * @openapi
+ * /folder:
+ *   get:
+ *     tags:
+ *       - Folders
+ *     summary: Récupérer tous les dossiers (Admin uniquement)
+ *     security:
+ *       - bearerAuth: []
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Liste de tous les dossiers
+ *       401:
+ *         description: Non authentifié
+ *       403:
+ *         description: Accès refusé (admin requis)
+ */
+
+/**
+ * @openapi
+ * /folder/create:
+ *   post:
+ *     tags:
+ *       - Folders
+ *     summary: Créer un nouveau dossier client
+ *     security:
+ *       - bearerAuth: []
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - userId
+ *               - vehicleId
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 description: ID de l'utilisateur propriétaire du dossier
+ *               vehicleId:
+ *                 type: integer
+ *                 description: ID du véhicule associé au dossier
+ *     responses:
+ *       201:
+ *         description: Dossier créé avec succès
+ *       400:
+ *         description: Données invalides
+ *       401:
+ *         description: Non authentifié
+ */
+
+/**
+ * @openapi
+ * /folder/user/{userId}:
+ *   get:
+ *     tags:
+ *       - Folders
+ *     summary: Récupérer tous les dossiers d'un utilisateur
+ *     security:
+ *       - bearerAuth: []
+ *       - cookieAuth: []
+ *     parameters:
+ *       - name: userId
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de l'utilisateur
+ *     responses:
+ *       200:
+ *         description: Liste des dossiers de l'utilisateur
+ *       404:
+ *         description: Utilisateur non trouvé
+ *       401:
+ *         description: Non authentifié
+ */
+
+/**
+ * @openapi
+ * /folder/{id}:
+ *   get:
+ *     tags:
+ *       - Folders
+ *     summary: Récupérer les détails d'un dossier
+ *     security:
+ *       - bearerAuth: []
+ *       - cookieAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID du dossier
+ *     responses:
+ *       200:
+ *         description: Détails du dossier
+ *       404:
+ *         description: Dossier non trouvé
+ *       401:
+ *         description: Non authentifié
+ *   delete:
+ *     tags:
+ *       - Folders
+ *     summary: Supprimer un dossier
+ *     security:
+ *       - bearerAuth: []
+ *       - cookieAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID du dossier
+ *     responses:
+ *       204:
+ *         description: Dossier supprimé avec succès
+ *       404:
+ *         description: Dossier non trouvé
+ *       403:
+ *         description: Accès refusé (non propriétaire du dossier)
+ *       401:
+ *         description: Non authentifié
+ */
+
+/**
+ * @openapi
+ * /folder/{id}/status:
+ *   put:
+ *     tags:
+ *       - Folders
+ *     summary: Mettre à jour le statut d'un dossier
+ *     security:
+ *       - bearerAuth: []
+ *       - cookieAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID du dossier
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - status
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [active, submitted, accepted, rejected, closed, cancelled, archived]
+ *                 description: Nouveau statut du dossier
+ *     responses:
+ *       200:
+ *         description: Statut du dossier mis à jour avec succès
+ *       404:
+ *         description: Dossier non trouvé
+ *       400:
+ *         description: Statut invalide
+ *       403:
+ *         description: Accès refusé (admin requis)
+ *       401:
+ *         description: Non authentifié
+ */
+
 export const createFolderRoutes = (prisma: PrismaClient) => {
   const router = Router();
   const controller = folderController(prisma);
