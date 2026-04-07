@@ -23,7 +23,7 @@ import { catchAsync } from "../utils/sentry.js";
  *   post:
  *     tags:
  *       - Authentication
- *     summary: Créer un nouveau compte
+ *     summary: Créer un nouveau compte (uniquement pour les clients)
  *     requestBody:
  *       required: true
  *       content:
@@ -164,7 +164,7 @@ import { catchAsync } from "../utils/sentry.js";
  *   delete:
  *     tags:
  *       - Authentication
- *     summary: Supprimer le compte
+ *     summary: Supprimer le compte (uniquement pour les clients)
  *     security:
  *       - bearerAuth: []
  *       - cookieAuth: []
