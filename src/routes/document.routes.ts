@@ -32,21 +32,20 @@ import { authMiddleware } from "../middlewares/auth.middleware.js";
  *             required:
  *               - file
  *               - folderId
- *               - fileName
  *             properties:
  *               file:
  *                 type: string
  *                 format: binary
  *                 description: Le fichier à uploader
  *               folderId:
- *                 type: string
+ *                 type: integer
  *                 description: ID du dossier contenant le document
- *               fileName:
+ *               name:
  *                 type: string
  *                 description: Nom du document
- *               description:
+ *               type:
  *                 type: string
- *                 description: Description optionnelle du document
+ *                 description: "Type du document (ex: 'carte d'identité', 'permis', etc.)"
  *     responses:
  *       201:
  *         description: Document uploadé avec succès
@@ -127,9 +126,9 @@ import { authMiddleware } from "../middlewares/auth.middleware.js";
  *           schema:
  *             type: object
  *             properties:
- *               fileName:
+ *               name:
  *                 type: string
- *               description:
+ *               type:
  *                 type: string
  *     responses:
  *       200:
@@ -153,7 +152,7 @@ import { authMiddleware } from "../middlewares/auth.middleware.js";
  *           type: string
  *         description: ID du document
  *     responses:
- *       204:
+ *       200:
  *         description: Document supprimé avec succès
  *       404:
  *         description: Document non trouvé

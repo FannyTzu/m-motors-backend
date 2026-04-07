@@ -55,7 +55,9 @@ import { catchAsync } from "../utils/sentry.js";
  *       201:
  *         description: Commande créée avec succès
  *       400:
- *         description: Données invalides
+ *         description: Données invalides ou véhicule ne correspond pas au dossier
+ *       403:
+ *         description: Dossier non trouvé ou accès refusé
  *       401:
  *         description: Non authentifié
  */
@@ -82,6 +84,8 @@ import { catchAsync } from "../utils/sentry.js";
  *         description: Détails de la commande
  *       404:
  *         description: Commande non trouvée
+ *       403:
+ *         description: Accès refusé
  *       401:
  *         description: Non authentifié
  */
@@ -106,8 +110,8 @@ import { catchAsync } from "../utils/sentry.js";
  *     responses:
  *       200:
  *         description: Liste des commandes du dossier
- *       404:
- *         description: Dossier non trouvé
+ *       403:
+ *         description: Dossier non trouvé ou accès refusé
  *       401:
  *         description: Non authentifié
  */

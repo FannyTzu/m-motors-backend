@@ -49,18 +49,15 @@ import {
  *           schema:
  *             type: object
  *             required:
- *               - name
  *               - userId
+ *               - vehicleId
  *             properties:
- *               name:
- *                 type: string
- *                 description: Nom du dossier
  *               userId:
  *                 type: string
  *                 description: ID de l'utilisateur propriétaire du dossier
- *               description:
- *                 type: string
- *                 description: Description optionnelle du dossier
+ *               vehicleId:
+ *                 type: integer
+ *                 description: ID du véhicule associé au dossier
  *     responses:
  *       201:
  *         description: Dossier créé avec succès
@@ -139,6 +136,8 @@ import {
  *         description: Dossier supprimé avec succès
  *       404:
  *         description: Dossier non trouvé
+ *       403:
+ *         description: Accès refusé (non propriétaire du dossier)
  *       401:
  *         description: Non authentifié
  */
@@ -171,7 +170,7 @@ import {
  *             properties:
  *               status:
  *                 type: string
- *                 enum: [ACTIVE, ARCHIVED, DELETED]
+ *                 enum: [active, submitted, accepted, rejected, closed, cancelled, archived]
  *                 description: Nouveau statut du dossier
  *     responses:
  *       200:
@@ -180,6 +179,8 @@ import {
  *         description: Dossier non trouvé
  *       400:
  *         description: Statut invalide
+ *       403:
+ *         description: Accès refusé (admin requis)
  *       401:
  *         description: Non authentifié
  */

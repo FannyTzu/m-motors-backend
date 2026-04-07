@@ -30,20 +30,16 @@ import { catchAsync } from "../utils/sentry.js";
  *             required:
  *               - order_id
  *               - amount
- *               - payment_method
  *             properties:
  *               order_id:
- *                 type: string
+ *                 type: integer
  *                 description: ID de la commande associée au paiement
  *               amount:
  *                 type: number
  *                 description: Montant du paiement
- *               payment_method:
+ *               transaction_id:
  *                 type: string
- *                 description: Méthode de paiement utilisée
- *               reference:
- *                 type: string
- *                 description: Référence externe du paiement (optionnel)
+ *                 description: Identifiant de transaction externe (optionnel)
  *     responses:
  *       201:
  *         description: Paiement créé avec succès
@@ -75,6 +71,8 @@ import { catchAsync } from "../utils/sentry.js";
  *         description: Détails du paiement
  *       404:
  *         description: Paiement non trouvé
+ *       403:
+ *         description: Accès refusé (paiement non accessible)
  *       401:
  *         description: Non authentifié
  *   patch:
@@ -102,13 +100,15 @@ import { catchAsync } from "../utils/sentry.js";
  *             properties:
  *               status:
  *                 type: string
- *                 enum: [pending, completed, failed, refunded]
+ *                 enum: [pending, paid, failed]
  *                 description: Nouveau statut du paiement
  *     responses:
  *       200:
  *         description: Statut du paiement mis à jour avec succès
  *       404:
  *         description: Paiement non trouvé
+ *       403:
+ *         description: Accès refusé (paiement non accessible)
  *       400:
  *         description: Statut invalide
  *       401:
