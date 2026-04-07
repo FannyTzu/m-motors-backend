@@ -3,6 +3,7 @@ import {
   PaymentStatus,
   OrderStatus,
   VehiclesStatus,
+  FolderStatus,
 } from "@prisma/client";
 
 export interface CreatePaymentData {
@@ -94,6 +95,11 @@ export const paymentService = (prisma: PrismaClient) => {
           await tx.vehicle.update({
             where: { id: payment.order.vehicle_id },
             data: { status: "sold" as VehiclesStatus },
+          });
+
+          await tx.folder.update({
+            where: { id: payment.order.folder_id },
+            data: { status: "closed" as FolderStatus },
           });
         }
 

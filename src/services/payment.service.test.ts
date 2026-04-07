@@ -13,6 +13,9 @@ const prismaMock = {
   vehicle: {
     update: jest.fn(),
   },
+  folder: {
+    update: jest.fn(),
+  },
   $transaction: jest.fn((cb) => cb(prismaMock)),
 } as any;
 

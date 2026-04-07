@@ -323,7 +323,12 @@ describe("vehicleService", () => {
       const result = await service.getVehiclesByType(VehiclesType.sale);
 
       expect(prismaMock.vehicle.findMany).toHaveBeenCalledWith({
-        where: { type: VehiclesType.sale },
+        where: {
+          type: VehiclesType.sale,
+          status: {
+            not: "sold",
+          },
+        },
       });
       expect(result).toEqual(mockVehicles);
       expect(result[0].type).toBe(VehiclesType.sale);
