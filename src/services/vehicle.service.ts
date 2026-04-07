@@ -74,13 +74,26 @@ export const vehicleService = (prisma: PrismaClient) => {
       });
       return vehicle;
     },
+    //Exclude vehicles sold, for clarity
     getAllVehicles: async () => {
-      const vehicles = await prisma.vehicle.findMany();
+      const vehicles = await prisma.vehicle.findMany({
+        where: {
+          status: {
+            not: "sold",
+          },
+        },
+      });
       return vehicles;
     },
+    //Exclude vehicles sold, for clarity
     getVehiclesByType: async (type: VehiclesType) => {
       const vehicles = await prisma.vehicle.findMany({
-        where: { type },
+        where: {
+          type,
+          status: {
+            not: "sold",
+          },
+        },
       });
       return vehicles;
     },
