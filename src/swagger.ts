@@ -7,11 +7,11 @@ const swaggerOptions = {
     openapi: "3.0.0",
     info: {
       title: "M-Motors API",
-      version: "2.0.0",
-      description: "API REST pour la gestion de véhicules et commandes",
+      version: "3.0.0",
+      description:
+        "API pour la gestion de véhicules et commandes côté admin et côté client",
       contact: {
         name: "M-Motors Support",
-        email: "support@mmotors.com",
       },
     },
     servers: [
