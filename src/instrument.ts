@@ -4,7 +4,7 @@ if (process.env.NODE_ENV === "production") {
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
     environment: "production",
-    tracesSampleRate: 0.1,
+    tracesSampleRate: 1.0,
     sendDefaultPii: false,
   });
 }
