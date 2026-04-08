@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import { orderService } from "../../services/order/order.service.js";
-import { addBreadcrumb } from "../../utils/sentry.js";
+import { addBreadcrumb, captureError } from "../../utils/sentry.js";
 
 export const orderController = (prisma: PrismaClient) => {
   return {
@@ -44,9 +44,15 @@ export const orderController = (prisma: PrismaClient) => {
 
         res.status(201).json(order);
       } catch (error: any) {
-        addBreadcrumb("Order creation error", "order", {
-          error: error.message,
-        });
+        captureError(
+          error instanceof Error
+            ? error
+            : new Error(error?.message ?? "Unknown error"),
+          {
+            tags: { feature: "order", operation: "create" },
+            extra: { folder_id, vehicle_id },
+          },
+        );
 
         if (error.message === "Vehicle not found") {
           return res.status(404).json({ error: "Vehicle not found" });
@@ -146,9 +152,15 @@ export const orderController = (prisma: PrismaClient) => {
 
         res.status(200).json(updatedOrder);
       } catch (error: any) {
-        addBreadcrumb("Order status update error", "order", {
-          error: error.message,
-        });
+        captureError(
+          error instanceof Error
+            ? error
+            : new Error(error?.message ?? "Unknown error"),
+          {
+            tags: { feature: "order", operation: "updateStatus" },
+            extra: { orderId: id, status },
+          },
+        );
 
         if (error.message === "Order not found") {
           return res.status(404).json({ error: "Order not found" });
