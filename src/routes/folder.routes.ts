@@ -5,6 +5,7 @@ import {
   authMiddleware,
   roleMiddleware,
 } from "../middlewares/auth.middleware.js";
+import { catchAsync } from "../utils/sentry.js";
 
 /**
  * @openapi
@@ -191,17 +192,21 @@ export const createFolderRoutes = (prisma: PrismaClient) => {
 
   router.use(authMiddleware);
 
-  router.get("/", roleMiddleware(Role.admin), controller.getAllFolders);
+  router.get(
+    "/",
+    roleMiddleware(Role.admin),
+    catchAsync(controller.getAllFolders),
+  );
 
-  router.post("/create", controller.createFolder);
+  router.post("/create", catchAsync(controller.createFolder));
 
-  router.get("/user/:userId", controller.getFoldersByUser);
+  router.get("/user/:userId", catchAsync(controller.getFoldersByUser));
 
-  router.get("/:id", controller.getFolderById);
+  router.get("/:id", catchAsync(controller.getFolderById));
 
-  router.put("/:id/status", controller.updateFolderStatus);
+  router.put("/:id/status", catchAsync(controller.updateFolderStatus));
 
-  router.delete("/:id", controller.deleteFolder);
+  router.delete("/:id", catchAsync(controller.deleteFolder));
 
   return router;
 };

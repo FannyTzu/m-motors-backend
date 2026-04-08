@@ -5,6 +5,7 @@ import {
   upload,
 } from "../controllers/document/document.controller.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
+import { catchAsync } from "../utils/sentry.js";
 
 /**
  * @openapi
@@ -166,15 +167,19 @@ export const documentRoutes = (prisma: PrismaClient): Router => {
 
   router.use(authMiddleware);
 
-  router.post("/", upload.single("file"), controller.uploadDocument);
+  router.post(
+    "/",
+    upload.single("file"),
+    catchAsync(controller.uploadDocument),
+  );
 
-  router.get("/folder/:folderId", controller.getDocumentsByFolder);
+  router.get("/folder/:folderId", catchAsync(controller.getDocumentsByFolder));
 
-  router.get("/:id", controller.getDocumentById);
+  router.get("/:id", catchAsync(controller.getDocumentById));
 
-  router.patch("/:id", controller.updateDocument);
+  router.patch("/:id", catchAsync(controller.updateDocument));
 
-  router.delete("/:id", controller.deleteDocument);
+  router.delete("/:id", catchAsync(controller.deleteDocument));
 
   return router;
 };

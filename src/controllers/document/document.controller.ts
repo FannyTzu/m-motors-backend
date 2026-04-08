@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { documentService } from "../../services/document/document.service.js";
 import { Request, Response } from "express";
 import multer from "multer";
+import { captureError } from "../../utils/sentry.js";
 
 const storage = multer.memoryStorage();
 export const upload = multer({
@@ -57,7 +58,12 @@ export const documentController = (prisma: PrismaClient) => {
 
         res.status(201).json(document);
       } catch (error) {
-        console.error("Error uploading document:", error);
+        captureError(
+          error instanceof Error ? error : new Error("Unknown error"),
+          {
+            tags: { feature: "document", operation: "upload" },
+          },
+        );
         res.status(500).json({
           error: "Failed to upload document",
           message: error instanceof Error ? error.message : "Unknown error",
@@ -71,7 +77,12 @@ export const documentController = (prisma: PrismaClient) => {
         const documents = await service.getDocumentsByFolder(Number(folderId));
         res.json(documents);
       } catch (error) {
-        console.error("Error getting documents:", error);
+        captureError(
+          error instanceof Error ? error : new Error("Unknown error"),
+          {
+            tags: { feature: "document", operation: "getByFolder" },
+          },
+        );
         res.status(500).json({
           error: "Failed to get documents",
           message: error instanceof Error ? error.message : "Unknown error",
@@ -90,7 +101,12 @@ export const documentController = (prisma: PrismaClient) => {
 
         res.json(document);
       } catch (error) {
-        console.error("Error getting document:", error);
+        captureError(
+          error instanceof Error ? error : new Error("Unknown error"),
+          {
+            tags: { feature: "document", operation: "getById" },
+          },
+        );
         res.status(500).json({
           error: "Failed to get document",
           message: error instanceof Error ? error.message : "Unknown error",
@@ -104,7 +120,12 @@ export const documentController = (prisma: PrismaClient) => {
         const result = await service.deleteDocument(Number(id));
         res.json(result);
       } catch (error) {
-        console.error("Error deleting document:", error);
+        captureError(
+          error instanceof Error ? error : new Error("Unknown error"),
+          {
+            tags: { feature: "document", operation: "delete" },
+          },
+        );
         res.status(500).json({
           error: "Failed to delete document",
           message: error instanceof Error ? error.message : "Unknown error",
@@ -130,7 +151,12 @@ export const documentController = (prisma: PrismaClient) => {
 
         res.json(document);
       } catch (error) {
-        console.error("Error updating document:", error);
+        captureError(
+          error instanceof Error ? error : new Error("Unknown error"),
+          {
+            tags: { feature: "document", operation: "update" },
+          },
+        );
         res.status(500).json({
           error: "Failed to update document",
           message: error instanceof Error ? error.message : "Unknown error",
