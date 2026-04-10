@@ -1,9 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import { documentController } from "./document.controller";
-import { documentService } from "../services/document.service.js";
+import { documentService } from "../../services/document/document.service.js";
 import { Request, Response } from "express";
 
-jest.mock("../services/document.service");
+jest.mock("../../services/document/document.service.js");
 
 describe("DocumentController", () => {
   let mockPrisma: any;

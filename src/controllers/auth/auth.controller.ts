@@ -5,8 +5,8 @@ import {
   loginUser,
   refreshAccessToken,
   deleteUserAccount,
-} from "../services/auth.service.js";
-import { addBreadcrumb, captureError } from "../utils/sentry.js";
+} from "../../services/auth/auth.service.js";
+import { addBreadcrumb, captureError } from "../../utils/sentry.js";
 
 export const authController = (prisma: PrismaClient) => {
   return {
@@ -20,7 +20,6 @@ export const authController = (prisma: PrismaClient) => {
 
         addBreadcrumb("User registered", "auth", {
           userId: result.newUser.id,
-          email: result.newUser.mail,
         });
 
         res.cookie("access_token", result.accessToken, {
@@ -76,7 +75,6 @@ export const authController = (prisma: PrismaClient) => {
 
         addBreadcrumb("User logged in", "auth", {
           userId: result.id,
-          email: result.email,
         });
 
         res.cookie("access_token", result.accessToken, {

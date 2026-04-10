@@ -9,6 +9,12 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 const SALT_ROUNDS = 12;
 
+const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+
+function validatePassword(password: string): boolean {
+  return PASSWORD_REGEX.test(password);
+}
+
 async function seedAdmin() {
   const adminEmail = process.env.ADMIN_EMAIL;
   const adminPassword = process.env.ADMIN_PASSWORD;
@@ -16,6 +22,12 @@ async function seedAdmin() {
   if (!adminEmail || !adminPassword) {
     throw new Error(
       "Admin email or password is not set in environment variables.",
+    );
+  }
+
+  if (!validatePassword(adminPassword)) {
+    throw new Error(
+      "Admin password must contain at least one uppercase letter, one number, and one special character (minimum 8 characters).",
     );
   }
 

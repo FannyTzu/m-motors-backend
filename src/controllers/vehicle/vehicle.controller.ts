@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-import { vehicleService } from "../services/vehicle.service.js";
-import { addBreadcrumb } from "../utils/sentry.js";
+import { vehicleService } from "../../services/vehicle/vehicle.service.js";
+import { addBreadcrumb, captureError } from "../../utils/sentry.js";
 import multer from "multer";
 
 const storage = multer.memoryStorage();
@@ -168,7 +168,13 @@ export const vehicleController = (prisma: PrismaClient) => {
           ...result,
         });
       } catch (error) {
-        console.error("Error uploading vehicle image:", error);
+        captureError(
+          error instanceof Error ? error : new Error("Unknown error"),
+          {
+            tags: { feature: "vehicle", operation: "uploadImage" },
+            extra: { vehicleId: req.params.id },
+          },
+        );
         res.status(500).json({
           error: "Failed to upload image",
           message: error instanceof Error ? error.message : "Unknown error",

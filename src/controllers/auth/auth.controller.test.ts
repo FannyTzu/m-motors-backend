@@ -1,8 +1,8 @@
 import request from "supertest";
-import * as authService from "../services/auth.service.js";
+import * as authService from "../../services/auth/auth.service.js";
 import jwt from "jsonwebtoken";
 
-jest.mock("../../src/services/auth.service");
+jest.mock("../../services/auth/auth.service.js");
 
 jest.mock("jsonwebtoken");
 
@@ -29,7 +29,7 @@ jest.mock("pg", () => ({
   Pool: jest.fn(),
 }));
 
-import { app } from "../app.js";
+import { app } from "../../app.js";
 
 it("return 201 and user if registration succeeds", async () => {
   (authService.registerUser as jest.Mock).mockResolvedValue({
@@ -39,7 +39,7 @@ it("return 201 and user if registration succeeds", async () => {
   });
   const response = await request(app)
     .post("/auth/register")
-    .send({ email: "test@example.com", password: "password123" });
+    .send({ email: "test@example.com", password: "Password123!!" });
   expect(response.status).toBe(201);
   expect(response.body.user).toEqual({
     id: 1,
@@ -55,7 +55,7 @@ it("return 409 if email is already used", async () => {
 
   const res = await request(app)
     .post("/auth/register")
-    .send({ email: "test@mail.com", password: "password123" });
+    .send({ email: "test@mail.com", password: "Test@1234" });
 
   expect(res.status).toBe(409);
   expect(res.body.error).toBe("Cet email est déjà utilisé.");
@@ -72,20 +72,20 @@ it("return 200 and user if login succeeds", async () => {
 
   const response = await request(app)
     .post("/auth/login")
-    .send({ email: "test@example.com", password: "password123" });
+    .send({ email: "test@example.com", password: "Password123!!" });
   expect(response.status).toBe(200);
   expect(response.headers["set-cookie"]).toBeDefined();
 });
-it("return 400 if login fails", async () => {
+it("return 401 if login fails", async () => {
   (authService.loginUser as jest.Mock).mockRejectedValue(
     new Error("Invalid credentials"),
   );
 
   const res = await request(app)
     .post("/auth/login")
-    .send({ email: "test@mail.com", password: "wrong" });
+    .send({ email: "test@mail.com", password: "BadPassword123!!" });
 
-  expect(res.status).toBe(400);
+  expect(res.status).toBe(401);
 });
 it("return 200 and user if login succeeds with token", async () => {
   process.env.JWT_ACCESS_SECRET = "test-secret";
@@ -99,7 +99,7 @@ it("return 200 and user if login succeeds with token", async () => {
 
   const res = await request(app)
     .post("/auth/login")
-    .send({ email: "test@mail.com", password: "password123" });
+    .send({ email: "test@mail.com", password: "Password123!!" });
 
   expect(res.status).toBe(200);
   expect(res.body.user).toEqual({

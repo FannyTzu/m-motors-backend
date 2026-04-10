@@ -30,7 +30,7 @@ describe("registerUser", () => {
     await expect(
       registerUser(prismaMock, {
         mail: "test@example.com",
-        password: "password123",
+        password: "password123!!",
       }),
     ).rejects.toThrow("Cet email est déjà utilisé.");
   });
@@ -51,9 +51,9 @@ describe("registerUser", () => {
     (jwt.sign as jest.Mock).mockReturnValue("accessToken");
     const result = await registerUser(prismaMock, {
       mail: "test@example.com",
-      password: "password123",
+      password: "Password123!!",
     });
-    expect(bcrypt.hash).toHaveBeenCalledWith("password123", 12);
+    expect(bcrypt.hash).toHaveBeenCalledWith("Password123!!", 12);
     expect(prismaMock.user.create).toHaveBeenCalled();
     expect(prismaMock.refreshToken.create).toHaveBeenCalled();
     expect(jwt.sign).toHaveBeenCalled();
@@ -84,7 +84,7 @@ describe("loginUser", () => {
     });
     (bcrypt.compare as jest.Mock).mockResolvedValue(false);
     await expect(
-      loginUser(prismaMock, "test@example.com", "badpassword"),
+      loginUser(prismaMock, "test@example.com", "badpassword123!!"),
     ).rejects.toThrow("Invalid credentials");
   });
   it("returns user information if credentials are valid", async () => {
@@ -104,7 +104,7 @@ describe("loginUser", () => {
     const result = await loginUser(
       prismaMock,
       "test@example.com",
-      "password123",
+      "Password123!!",
     );
     expect(result.id).toBe(1);
     expect(result.email).toBe("test@example.com");

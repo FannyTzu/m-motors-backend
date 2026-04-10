@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
-import { folderService } from "../services/folder.service.js";
+import { folderService } from "../../services/folder/folder.service.js";
 import { Request, Response } from "express";
+import { captureError } from "../../utils/sentry.js";
 
 export const folderController = (prisma: PrismaClient) => {
   return {
@@ -10,6 +11,12 @@ export const folderController = (prisma: PrismaClient) => {
         res.json(folders);
       } catch (error) {
         console.error("Error fetching all folders:", error);
+        captureError(
+          error instanceof Error ? error : new Error("Unknown error"),
+          {
+            tags: { feature: "folder", operation: "getAll" },
+          },
+        );
         res.status(500).json({ error: "Failed to fetch all folders" });
       }
     },
@@ -81,6 +88,10 @@ export const folderController = (prisma: PrismaClient) => {
           return res.status(400).json({ error: err.message });
         }
         console.error("Error updating folder status:", err);
+        captureError(err, {
+          tags: { feature: "folder", operation: "updateStatus" },
+          extra: { folderId: id, status },
+        });
         return res.status(500).json({
           error: "Failed to update folder status",
           message: err.message,
@@ -109,6 +120,10 @@ export const folderController = (prisma: PrismaClient) => {
           return res.status(403).json({ error: err.message });
         }
         console.error("Error deleting folder:", err);
+        captureError(err, {
+          tags: { feature: "folder", operation: "delete" },
+          extra: { folderId: id },
+        });
         return res.status(500).json({
           error: "Failed to delete folder",
           message: err.message,

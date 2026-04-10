@@ -1,5 +1,5 @@
-import { PrismaClient, FolderStatus } from "@prisma/client";
-import { supabase, BUCKET_DOCUMENTS } from "../utils/supabase.js";
+import { PrismaClient, FolderStatus, VehiclesStatus } from "@prisma/client";
+import { supabase, BUCKET_DOCUMENTS } from "../../utils/supabase.js";
 
 export const folderService = (prisma: PrismaClient) => {
   return {
@@ -11,13 +11,40 @@ export const folderService = (prisma: PrismaClient) => {
       if (existingFolder) {
         throw new Error("Un dossier existe déjà pour ce véhicule.");
       }
-      const folder = await prisma.folder.create({
-        data: {
-          user_id: userId,
-          status: FolderStatus.active,
-          vehicle_id: vehicleId,
-        },
+
+      const vehicle = await prisma.vehicle.findUnique({
+        where: { id: vehicleId },
       });
+
+      if (!vehicle) {
+        throw new Error("Vehicle not found");
+      }
+
+      if (vehicle.status === VehiclesStatus.sold) {
+        throw new Error("Ce véhicule est déjà vendu.");
+      }
+
+      if (vehicle.status === VehiclesStatus.reserved) {
+        throw new Error("Ce véhicule est déjà réservé.");
+      }
+
+      const folder = await prisma.$transaction(async (tx) => {
+        const createdFolder = await tx.folder.create({
+          data: {
+            user_id: userId,
+            status: FolderStatus.active,
+            vehicle_id: vehicleId,
+          },
+        });
+
+        await tx.vehicle.update({
+          where: { id: vehicleId },
+          data: { status: VehiclesStatus.reserved },
+        });
+
+        return createdFolder;
+      });
+
       return folder;
     },
     getAllFolders: async () => {
