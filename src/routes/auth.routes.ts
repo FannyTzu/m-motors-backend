@@ -39,7 +39,8 @@ import { catchAsync } from "../utils/sentry.js";
  *                 format: email
  *               password:
  *                 type: string
- *                 minLength: 6
+ *                 minLength: 8
+ *                 description: Password must contain at least one uppercase letter, one number, and one special character
  *     responses:
  *       201:
  *         description: Compte créé avec succès
