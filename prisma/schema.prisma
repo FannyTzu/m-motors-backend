@@ -125,6 +125,7 @@ model Order {
   status       OrderStatus   @default(draft)
   created_at   DateTime      @default(now())
   payments     Payment[]
+  options      OrderOption[]
 }
 
 model Option {
@@ -132,6 +133,7 @@ model Option {
   name        String
   price       Decimal  @db.Decimal(12, 2)
   description String?
+  orders      OrderOption[]
 }
 
 model Payment {
@@ -142,6 +144,17 @@ model Payment {
   status         PaymentStatus @default(pending)
   transaction_id String?
   paid_at        DateTime?
+}
+
+model OrderOption {
+  id              Int     @id @default(autoincrement())
+  order_id        Int
+  order           Order   @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  option_id       Int
+  option          Option  @relation(fields: [option_id], references: [id], onDelete: Restrict)
+  price_at_order  Decimal @db.Decimal(12, 2)
+
+  @@unique([order_id, option_id])
 }
 
 model Document {

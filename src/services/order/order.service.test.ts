@@ -11,6 +11,9 @@ describe("orderService", () => {
       vehicle: {
         findUnique: jest.fn(),
       } as any,
+      option: {
+        findMany: jest.fn(),
+      } as any,
       order: {
         create: jest.fn(),
         findUnique: jest.fn(),
@@ -40,11 +43,13 @@ describe("orderService", () => {
         total_amount: new Decimal("25000"),
         status: "draft",
         vehicle: mockVehicle,
+        options: [],
       };
 
       (mockPrisma.vehicle!.findUnique as jest.Mock).mockResolvedValue(
         mockVehicle,
       );
+      (mockPrisma.option!.findMany as jest.Mock).mockResolvedValue([]);
       (mockPrisma.order!.create as jest.Mock).mockResolvedValue(
         mockCreatedOrder,
       );
@@ -66,9 +71,15 @@ describe("orderService", () => {
           vehicle_id: 1,
           total_amount: new Decimal("25000"),
           status: "draft",
+          options: undefined,
         },
         include: {
           vehicle: true,
+          options: {
+            include: {
+              option: true,
+            },
+          },
         },
       });
       expect(result).toEqual(mockCreatedOrder);
@@ -101,11 +112,13 @@ describe("orderService", () => {
         total_amount: new Decimal("25000.50"),
         status: "draft",
         vehicle: mockVehicle,
+        options: [],
       };
 
       (mockPrisma.vehicle!.findUnique as jest.Mock).mockResolvedValue(
         mockVehicle,
       );
+      (mockPrisma.option!.findMany as jest.Mock).mockResolvedValue([]);
       (mockPrisma.order!.create as jest.Mock).mockResolvedValue(
         mockCreatedOrder,
       );
@@ -124,9 +137,15 @@ describe("orderService", () => {
           vehicle_id: 1,
           total_amount: new Decimal("25000.50"),
           status: "draft",
+          options: undefined,
         },
         include: {
           vehicle: true,
+          options: {
+            include: {
+              option: true,
+            },
+          },
         },
       });
       expect(result).toEqual(mockCreatedOrder);
@@ -144,6 +163,7 @@ describe("orderService", () => {
         folder: { id: 10, user_id: 5 },
         vehicle: { id: 1, brand: "Tesla" },
         payments: [],
+        options: [],
       };
 
       (mockPrisma.order!.findUnique as jest.Mock).mockResolvedValue(mockOrder);
@@ -156,6 +176,11 @@ describe("orderService", () => {
           folder: true,
           vehicle: true,
           payments: true,
+          options: {
+            include: {
+              option: true,
+            },
+          },
         },
       });
       expect(result).toEqual(mockOrder);
@@ -181,6 +206,7 @@ describe("orderService", () => {
           status: "draft",
           vehicle: { id: 1 },
           payments: [],
+          options: [],
         },
       ];
 
@@ -193,6 +219,11 @@ describe("orderService", () => {
         include: {
           vehicle: true,
           payments: true,
+          options: {
+            include: {
+              option: true,
+            },
+          },
         },
       });
       expect(result).toEqual(mockOrders);
@@ -216,6 +247,7 @@ describe("orderService", () => {
         total_amount: new Decimal("25000"),
         status: "confirmed",
         vehicle: { id: 1 },
+        options: [],
       };
 
       (mockPrisma.order!.update as jest.Mock).mockResolvedValue(
@@ -229,6 +261,11 @@ describe("orderService", () => {
         data: { status: "confirmed" },
         include: {
           vehicle: true,
+          options: {
+            include: {
+              option: true,
+            },
+          },
         },
       });
       expect(result).toEqual(mockUpdatedOrder);

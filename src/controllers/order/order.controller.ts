@@ -6,7 +6,7 @@ import { addBreadcrumb, captureError } from "../../utils/sentry.js";
 export const orderController = (prisma: PrismaClient) => {
   return {
     createOrder: async (req: Request, res: Response) => {
-      const { folder_id, vehicle_id } = req.body;
+      const { folder_id, vehicle_id, optionIds } = req.body;
       const userId = req.user?.sub;
 
       if (!userId) {
@@ -34,15 +34,28 @@ export const orderController = (prisma: PrismaClient) => {
           folder_id,
           vehicle_id,
           user_id: userId,
+          optionIds: optionIds || [],
         });
+
+        const formattedOrder = {
+          ...order,
+          options:
+            order.options?.map((o: any) => ({
+              id: o.option.id,
+              name: o.option.name,
+              price: o.price_at_order,
+              description: o.option.description,
+            })) || [],
+        };
 
         addBreadcrumb("Order created", "order", {
           orderId: order.id,
           folderId: folder_id,
           vehicleId: vehicle_id,
+          optionsCount: optionIds?.length || 0,
         });
 
-        res.status(201).json(order);
+        res.status(201).json(formattedOrder);
       } catch (error: any) {
         captureError(
           error instanceof Error
@@ -81,7 +94,18 @@ export const orderController = (prisma: PrismaClient) => {
           return res.status(403).json({ error: "Access denied" });
         }
 
-        res.status(200).json(order);
+        const formattedOrder = {
+          ...order,
+          options:
+            order.options?.map((o: any) => ({
+              id: o.option.id,
+              name: o.option.name,
+              price: o.price_at_order,
+              description: o.option.description,
+            })) || [],
+        };
+
+        res.status(200).json(formattedOrder);
       } catch (error: any) {
         if (error.message === "Order not found") {
           return res.status(404).json({ error: "Order not found" });
@@ -114,7 +138,18 @@ export const orderController = (prisma: PrismaClient) => {
           Number(folder_id),
         );
 
-        res.status(200).json(orders);
+        const formattedOrders = orders.map((order: any) => ({
+          ...order,
+          options:
+            order.options?.map((o: any) => ({
+              id: o.option.id,
+              name: o.option.name,
+              price: o.price_at_order,
+              description: o.option.description,
+            })) || [],
+        }));
+
+        res.status(200).json(formattedOrders);
       } catch (error) {
         res.status(500).json({ error: "Internal server error" });
       }
@@ -145,12 +180,23 @@ export const orderController = (prisma: PrismaClient) => {
           status,
         );
 
+        const formattedOrder = {
+          ...updatedOrder,
+          options:
+            updatedOrder.options?.map((o: any) => ({
+              id: o.option.id,
+              name: o.option.name,
+              price: o.price_at_order,
+              description: o.option.description,
+            })) || [],
+        };
+
         addBreadcrumb("Order status updated", "order", {
-          orderId: updatedOrder.id,
+          orderId: formattedOrder.id,
           status,
         });
 
-        res.status(200).json(updatedOrder);
+        res.status(200).json(formattedOrder);
       } catch (error: any) {
         captureError(
           error instanceof Error
