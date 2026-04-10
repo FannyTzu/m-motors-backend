@@ -5,6 +5,7 @@ export interface CreateOrderData {
   folder_id: number;
   vehicle_id: number;
   user_id: number;
+  optionIds?: number[];
 }
 
 export const orderService = (prisma: PrismaClient) => {
@@ -19,7 +20,24 @@ export const orderService = (prisma: PrismaClient) => {
       }
 
       const vehiclePrice = new Decimal(vehicle.price.toString());
-      const totalAmount = vehiclePrice;
+      let totalAmount = vehiclePrice;
+      let options: any[] = [];
+
+      if (data.optionIds && data.optionIds.length > 0) {
+        options = await prisma.option.findMany({
+          where: {
+            id: {
+              in: data.optionIds,
+            },
+          },
+        });
+
+        const optionsTotal = options.reduce((sum, option) => {
+          return sum.plus(new Decimal(option.price.toString()));
+        }, new Decimal(0));
+
+        totalAmount = vehiclePrice.plus(optionsTotal);
+      }
 
       const order = await prisma.order.create({
         data: {
@@ -27,9 +45,23 @@ export const orderService = (prisma: PrismaClient) => {
           vehicle_id: data.vehicle_id,
           total_amount: totalAmount,
           status: "draft",
+          options:
+            options.length > 0
+              ? {
+                  create: options.map((option) => ({
+                    option_id: option.id,
+                    price_at_order: option.price,
+                  })),
+                }
+              : undefined,
         },
         include: {
           vehicle: true,
+          options: {
+            include: {
+              option: true,
+            },
+          },
         },
       });
 
@@ -43,6 +75,11 @@ export const orderService = (prisma: PrismaClient) => {
           folder: true,
           vehicle: true,
           payments: true,
+          options: {
+            include: {
+              option: true,
+            },
+          },
         },
       });
 
@@ -59,6 +96,11 @@ export const orderService = (prisma: PrismaClient) => {
         include: {
           vehicle: true,
           payments: true,
+          options: {
+            include: {
+              option: true,
+            },
+          },
         },
       });
 
@@ -71,6 +113,11 @@ export const orderService = (prisma: PrismaClient) => {
         data: { status: status as any },
         include: {
           vehicle: true,
+          options: {
+            include: {
+              option: true,
+            },
+          },
         },
       });
 
