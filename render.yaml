@@ -2,7 +2,7 @@ services:
   - type: web
     name: m-motors-backend
     env: node
-    buildCommand: npm install --include=dev && npx prisma migrate deploy && npm run build
+    buildCommand: NODE_ENV=development npm install && npx prisma migrate deploy && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
