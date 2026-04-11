@@ -10,7 +10,9 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
+    "rootDir": "./src",
     "outDir": "./dist",
+    "ignoreDeprecations": "6.0",
     "types": ["jest", "node"]
   },
   "ts-node": {
