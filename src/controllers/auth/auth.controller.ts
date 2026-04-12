@@ -97,6 +97,7 @@ export const authController = (prisma: PrismaClient) => {
             email: result.email,
             role: result.role,
           },
+          accessToken: result.accessToken,
         });
       } catch (error) {
         const err = error instanceof Error ? error : new Error("Unknown error");
